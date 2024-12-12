@@ -1,0 +1,11 @@
+<!-- src/app/components/dashboard/attendee/attendee.component.html -->
+
+<div class="min-h-screen bg-gray-900 text-white">
+    <nav class="flex justify-between items-center p-4 bg-gray-800">
+        <h1 class="text-xl">Attendee Dashboard</h1>
+        <button (click)="logout()" class="px-3 py-1 bg-red-600 rounded">Logout</button>
+    </nav>
+    <div class="p-4">
+        <router-outlet></router-outlet>
+    </div>
+</div>

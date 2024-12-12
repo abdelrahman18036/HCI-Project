@@ -1,0 +1,22 @@
+<!-- src/app/components/events/event-detail/event-detail.component.html -->
+
+<div *ngIf="isLoading" class="flex justify-center items-center h-full">
+    <p class="text-xl">Loading...</p>
+</div>
+<div *ngIf="!isLoading && event" class="p-4 bg-gray-800 rounded">
+    <h1 class="text-3xl font-bold mb-4">{{ event.title }}</h1>
+    <p class="mb-2"><strong>Description:</strong> {{ event.description }}</p>
+    <p class="mb-2"><strong>Date:</strong> {{ event.date }}</p>
+    <p class="mb-2"><strong>Time:</strong> {{ event.time }}</p>
+    <p class="mb-2"><strong>Location:</strong> {{ event.location }}</p>
+    <p class="mb-2"><strong>Category:</strong> {{ event.category }}</p>
+    <p class="mb-4"><strong>Price:</strong> ${{ event.ticket_price }}</p>
+    <img [src]="event.promotional_image" alt="{{ event.title }}" class="w-full h-auto mb-4 rounded">
+    <video *ngIf="event.promotional_video" controls class="w-full h-auto rounded">
+        <source [src]="event.promotional_video" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+</div>
+<div *ngIf="!isLoading && error" class="p-4 bg-red-600 text-white rounded">
+    <p>{{ error }}</p>
+</div>

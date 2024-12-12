@@ -1,0 +1,31 @@
+<!-- src/app/components/feedback/feedback-list/feedback-list.component.html -->
+
+<div class="p-4 bg-gray-800 rounded">
+    <h2 class="text-2xl mb-4">Feedback</h2>
+    <form [formGroup]="feedbackForm" (ngSubmit)="onSubmit()" class="mb-4">
+        <div class="mb-4">
+            <label class="block mb-1">Event</label>
+            <select formControlName="event" class="w-full px-3 py-2 bg-gray-700 rounded" required>
+                <option value="">Select Event</option>
+                <option *ngFor="let event of events" [value]="event.id">{{ event.title }}</option>
+            </select>
+        </div>
+        <div class="mb-4">
+            <label class="block mb-1">Rating</label>
+            <select formControlName="rating" class="w-full px-3 py-2 bg-gray-700 rounded" required>
+                <option value="">Select Rating</option>
+                <option *ngFor="let r of [1,2,3,4,5]" [value]="r">{{ r }}</option>
+            </select>
+        </div>
+        <div class="mb-4">
+            <label class="block mb-1">Comments</label>
+            <textarea formControlName="comments" class="w-full px-3 py-2 bg-gray-700 rounded"></textarea>
+        </div>
+        <button type="submit" class="px-4 py-2 bg-blue-600 rounded">Submit Feedback</button>
+    </form>
+    <div *ngFor="let feedback of feedbacks" class="mb-4 p-4 bg-gray-700 rounded">
+        <h3 class="text-xl">{{ feedback.event.title }}</h3>
+        <p>Rating: {{ feedback.rating }}</p>
+        <p>Comments: {{ feedback.comments }}</p>
+    </div>
+</div>

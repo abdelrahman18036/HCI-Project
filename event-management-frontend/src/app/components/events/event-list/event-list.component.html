@@ -1,0 +1,14 @@
+<div class="flex flex-col">
+    <div class="flex justify-between mb-4">
+        <h2 class="text-2xl">Events</h2>
+        <a routerLink="/events/create" class="px-4 py-2 bg-green-600 rounded">Create Event</a>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div *ngFor="let event of events" class="p-4 bg-gray-800 rounded">
+            <h3 class="text-xl">{{ event.title }}</h3>
+            <p>{{ event.description }}</p>
+            <p>{{ event.date }} at {{ event.time }}</p>
+            <a [routerLink]="['/events', event.id]" class="text-blue-500">View Details</a>
+        </div>
+    </div>
+</div>
