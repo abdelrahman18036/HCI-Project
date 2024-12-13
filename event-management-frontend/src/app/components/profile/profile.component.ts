@@ -66,7 +66,7 @@ export class ProfileComponent implements OnInit {
         this.isLoading = false;
       },
       error: (error) => {
-        this.errorMessage = error.message || 'Failed to fetch profile';
+        this.errorMessage = error || 'Failed to fetch profile';
         this.isLoading = false;
       },
     });
@@ -99,7 +99,7 @@ export class ProfileComponent implements OnInit {
         this.isLoading = false;
       },
       error: (error) => {
-        this.errorMessage = error.message || 'Failed to update profile';
+        this.errorMessage = error || 'Failed to update profile';
         this.successMessage = '';
         this.isLoading = false;
       },

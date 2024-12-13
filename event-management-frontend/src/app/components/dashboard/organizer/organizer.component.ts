@@ -1,23 +1,19 @@
-// src/app/components/dashboard/organizer/organizer.component.ts
-
 import { Component, OnInit } from '@angular/core';
 import { EventService } from '../../../services/event.service';
 import { AuthService } from '../../../services/auth.service';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-organizer',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './organizer.component.html',
   styleUrls: ['./organizer.component.css'],
 })
 export class OrganizerComponent implements OnInit {
   events: any[] = [];
-
   isLoading: boolean = false;
   errorMessage: string = '';
 

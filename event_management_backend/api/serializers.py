@@ -57,10 +57,16 @@ class TicketSerializer(serializers.ModelSerializer):
 class EventSerializer(serializers.ModelSerializer):
     organizer = serializers.ReadOnlyField(source='organizer.username')
     tickets = TicketSerializer(many=True, read_only=True)
+    attendees = serializers.SerializerMethodField()  # New field
 
     class Meta:
         model = Event
         fields = '__all__'
+    
+    def get_attendees(self, obj):
+        registrations = Registration.objects.filter(event=obj)
+        attendees = [registration.attendee for registration in registrations]
+        return AttendeeSerializer(attendees, many=True).data
 
 # Registration Serializer
 class RegistrationSerializer(serializers.ModelSerializer):
@@ -77,3 +83,9 @@ class FeedbackSerializer(serializers.ModelSerializer):
     class Meta:
         model = Feedback
         fields = '__all__'
+
+
+class AttendeeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email']

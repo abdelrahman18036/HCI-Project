@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import (
-    SignupView, LoginView,
+    EventAttendeesListView, SignupView, LoginView,
     EventListCreateView, EventRetrieveUpdateDestroyView,
     TicketListCreateView, TicketRetrieveUpdateDestroyView,
     RegistrationListCreateView, FeedbackListCreateView,
@@ -35,5 +35,7 @@ urlpatterns = [
     path('attendee/registrations/', AttendeeRegistrationListView.as_view(), name='attendee-registration-list'),
 
     # User Profile
-     path('profile/', UserProfileView.as_view(), name='profile'),
+    path('profile/', UserProfileView.as_view(), name='profile'),
+    path('events/<int:event_id>/attendees/', EventAttendeesListView.as_view(), name='event-attendees-list'),  # New route
+
 ]

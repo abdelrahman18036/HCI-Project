@@ -24,8 +24,11 @@ export class EventService {
 
   constructor(private http: HttpClient) {}
 
-  getEvents(): Observable<any> {
-    return this.http.get(this.baseUrl);
+  getEvents(): Observable<any[]> {
+    // Order by is_promotion descending and created_at descending
+    return this.http.get<any[]>(
+      `${this.baseUrl}?ordering=-is_promotion,-created_at`
+    );
   }
 
   getEvent(id: number): Observable<any> {
@@ -58,5 +61,18 @@ export class EventService {
 
   getOrganizerEvents(): Observable<any[]> {
     return this.http.get<any[]>('http://localhost:8000/api/organizer/events/');
+  }
+
+  getEventAttendees(eventId: number): Observable<any[]> {
+    return this.http.get<any[]>(
+      `http://localhost:8000/api/events/${eventId}/attendees/`
+    );
+  }
+
+  createTicket(eventId: number, ticketData: any): Observable<any> {
+    return this.http.post<any>(
+      `http://localhost:8000/api/events/${eventId}/tickets/`,
+      ticketData
+    );
   }
 }

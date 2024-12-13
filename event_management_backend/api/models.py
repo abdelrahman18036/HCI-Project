@@ -22,10 +22,12 @@ class Event(models.Model):
     location = models.CharField(max_length=255)
     category = models.CharField(max_length=100)
     ticket_price = models.DecimalField(max_digits=8, decimal_places=2)
-    promotional_image = models.ImageField(upload_to='promotions/', null=True, blank=True)
-    promotional_video = models.FileField(upload_to='promotions/videos/', null=True, blank=True)
+    promotional_image = models.ImageField(upload_to='event_images/', null=True, blank=True)
+    promotional_video = models.FileField(upload_to='event_videos/', null=True, blank=True)
+    is_promotion = models.BooleanField(default=False)  # New field
     created_at = models.DateTimeField(auto_now_add=True)
-
+    updated_at = models.DateTimeField(auto_now=True)
+    
     def __str__(self):
         return self.title
 

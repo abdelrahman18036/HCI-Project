@@ -2,7 +2,7 @@
 
 from rest_framework import generics, permissions, status
 from .models import User, Event, Ticket, Registration, Feedback
-from .serializers import UserSerializer, EventSerializer, TicketSerializer, RegistrationSerializer, FeedbackSerializer
+from .serializers import AttendeeSerializer, UserSerializer, EventSerializer, TicketSerializer, RegistrationSerializer, FeedbackSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -132,3 +132,12 @@ class UserProfileView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_object(self):
         return self.request.user
+
+
+class EventAttendeesListView(generics.ListAPIView):
+    serializer_class = AttendeeSerializer
+    permission_classes = [permissions.IsAuthenticated, permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        event_id = self.kwargs['event_id']
+        return User.objects.filter(registrations__event_id=event_id).distinct()

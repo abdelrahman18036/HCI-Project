@@ -1,5 +1,3 @@
-// src/app/app-routing.module.ts
-
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
@@ -18,11 +16,20 @@ import { ProfileComponent } from './components/profile/profile.component';
 
 import { AuthGuard } from './guards/auth.guard';
 import { RoleGuard } from './guards/role.guard';
+import { RedirectIfLoggedInGuard } from './guards/redirect-if-logged-in.guard';
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
-  { path: 'login', component: LoginComponent },
-  { path: 'signup', component: SignupComponent },
+  {
+    path: 'login',
+    component: LoginComponent,
+    canActivate: [RedirectIfLoggedInGuard],
+  },
+  {
+    path: 'signup',
+    component: SignupComponent,
+    canActivate: [RedirectIfLoggedInGuard],
+  },
   {
     path: 'organizer',
     component: OrganizerComponent,
@@ -42,7 +49,10 @@ const routes: Routes = [
     canActivate: [AuthGuard, RoleGuard],
     data: { expectedRole: 'organizer' },
   },
-  { path: 'events/:id', component: EventDetailComponent },
+  {
+    path: 'events/:id',
+    component: EventDetailComponent,
+  },
   { path: 'tickets', component: TicketListComponent },
   { path: 'tickets/:id', component: TicketDetailComponent },
   {
