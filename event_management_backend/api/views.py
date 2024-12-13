@@ -1,3 +1,5 @@
+# your_app/views.py
+
 from rest_framework import generics, permissions, status
 from .models import User, Event, Ticket, Registration, Feedback
 from .serializers import UserSerializer, EventSerializer, TicketSerializer, RegistrationSerializer, FeedbackSerializer
@@ -25,6 +27,8 @@ class LoginView(APIView):
             return Response({
                 'refresh': str(refresh),
                 'access': str(refresh.access_token),
+                'user_type': user.user_type,
+                'username': user.username,
             }, status=status.HTTP_200_OK)
         return Response({'error': 'Invalid Credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 

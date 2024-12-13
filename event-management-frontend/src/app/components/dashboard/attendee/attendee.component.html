@@ -10,6 +10,26 @@
         </div>
     </nav>
     <div class="p-4">
-        <router-outlet></router-outlet>
+        <div class="flex justify-between mb-4">
+            <h2 class="text-3xl text-white">My Registrations</h2>
+        </div>
+        <div *ngIf="isLoading" class="flex justify-center items-center">
+            <p class="text-gray-300">Loading...</p>
+        </div>
+        <div *ngIf="errorMessage" class="mb-4 text-red-500">
+            {{ errorMessage }}
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div *ngFor="let registration of registrations" class="p-4 bg-gray-800 rounded">
+                <h3 class="text-xl">{{ registration.event.title }}</h3>
+                <p>Date: {{ registration.event.date }}</p>
+                <p>Time: {{ registration.event.time }}</p>
+                <p>Location: {{ registration.event.location }}</p>
+                <p>Ticket Type: {{ registration.ticket.ticket_type }}</p>
+                <a [routerLink]="['/events', registration.event.id]" class="text-blue-500 hover:underline">
+                    View Event
+                </a>
+            </div>
+        </div>
     </div>
 </div>

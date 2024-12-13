@@ -1,3 +1,5 @@
+# your_app/serializers.py
+
 from rest_framework import serializers
 from .models import User, Event, Ticket, Registration, Feedback
 from django.contrib.auth.password_validation import validate_password
@@ -45,18 +47,19 @@ class UserSerializer(serializers.ModelSerializer):
         user.save()
         return user
 
-# Event Serializer
-class EventSerializer(serializers.ModelSerializer):
-    organizer = serializers.ReadOnlyField(source='organizer.username')
-
-    class Meta:
-        model = Event
-        fields = '__all__'
-
 # Ticket Serializer
 class TicketSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
+        fields = '__all__'
+
+# Event Serializer
+class EventSerializer(serializers.ModelSerializer):
+    organizer = serializers.ReadOnlyField(source='organizer.username')
+    tickets = TicketSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Event
         fields = '__all__'
 
 # Registration Serializer

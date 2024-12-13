@@ -1,8 +1,8 @@
-// src/app/app.routes.ts
-
+//app.routes.ts;
 import { Routes } from '@angular/router';
 import { LoginComponent } from './components/auth/login/login.component';
 import { SignupComponent } from './components/auth/signup/signup.component';
+import { ProfileComponent } from './components/profile/profile.component';
 import { OrganizerComponent } from './components/dashboard/organizer/organizer.component';
 import { AttendeeComponent } from './components/dashboard/attendee/attendee.component';
 import { EventListComponent } from './components/events/event-list/event-list.component';
@@ -12,7 +12,6 @@ import { TicketListComponent } from './components/tickets/ticket-list/ticket-lis
 import { TicketDetailComponent } from './components/tickets/ticket-detail/ticket-detail.component';
 import { RegistrationListComponent } from './components/registrations/registration-list/registration-list.component';
 import { FeedbackListComponent } from './components/feedback/feedback-list/feedback-list.component';
-import { ProfileComponent } from './components/profile/profile.component';
 import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [

@@ -2,6 +2,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { EventService } from '../../../services/event.service';
+import { AuthService } from '../../../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
@@ -14,13 +15,30 @@ import { RouterModule } from '@angular/router';
 })
 export class EventListComponent implements OnInit {
   events: any[] = [];
+  userType: string | null = null;
+  isLoading: boolean = false;
+  errorMessage: string = '';
 
-  constructor(private eventService: EventService) {}
+  constructor(
+    private eventService: EventService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
+    this.userType = this.authService.getUserType();
+    this.loadEvents();
+  }
+
+  loadEvents(): void {
+    this.isLoading = true;
     this.eventService.getEvents().subscribe({
       next: (data) => {
         this.events = data;
+        this.isLoading = false;
+      },
+      error: (err) => {
+        this.errorMessage = 'Failed to load events.';
+        this.isLoading = false;
       },
     });
   }

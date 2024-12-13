@@ -1,13 +1,12 @@
-// src/app/app.module.ts
-
+//app.module.ts
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { ReactiveFormsModule } from '@angular/forms';
-
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app.component';
+import { CommonModule } from '@angular/common';
 
+// Add all your component imports
 import { LoginComponent } from './components/auth/login/login.component';
 import { SignupComponent } from './components/auth/signup/signup.component';
 import { OrganizerComponent } from './components/dashboard/organizer/organizer.component';
@@ -21,36 +20,39 @@ import { RegistrationListComponent } from './components/registrations/registrati
 import { FeedbackListComponent } from './components/feedback/feedback-list/feedback-list.component';
 import { ProfileComponent } from './components/profile/profile.component';
 
+// Other imports
 import { AuthService } from './services/auth.service';
 import { EventService } from './services/event.service';
 import { TicketService } from './services/ticket.service';
 import { RegistrationService } from './services/registration.service';
 import { FeedbackService } from './services/feedback.service';
-
 import { AuthGuard } from './guards/auth.guard';
 import { AuthInterceptorService } from './services/auth-interceptor.service';
+import { AppComponent } from './app.component';
 
 @NgModule({
   declarations: [
-    AppComponent,
-    LoginComponent,
-    SignupComponent,
     OrganizerComponent,
+
+    TicketDetailComponent,
+    RegistrationListComponent,
+  ],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    CommonModule,
+    HttpClientModule,
+    ReactiveFormsModule,
+    FormsModule,
     AttendeeComponent,
     EventListComponent,
     EventDetailComponent,
     EventCreateComponent,
     TicketListComponent,
-    TicketDetailComponent,
-    RegistrationListComponent,
     FeedbackListComponent,
     ProfileComponent,
-  ],
-  imports: [
-    BrowserModule, // Keep BrowserModule here
-    AppRoutingModule,
-    HttpClientModule,
-    ReactiveFormsModule, // Keep ReactiveFormsModule here
+    LoginComponent,
+    SignupComponent,
   ],
   providers: [
     AuthService,

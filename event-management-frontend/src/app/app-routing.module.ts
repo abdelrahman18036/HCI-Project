@@ -1,3 +1,5 @@
+// src/app/app-routing.module.ts
+
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
@@ -12,8 +14,10 @@ import { TicketListComponent } from './components/tickets/ticket-list/ticket-lis
 import { TicketDetailComponent } from './components/tickets/ticket-detail/ticket-detail.component';
 import { RegistrationListComponent } from './components/registrations/registration-list/registration-list.component';
 import { FeedbackListComponent } from './components/feedback/feedback-list/feedback-list.component';
+import { ProfileComponent } from './components/profile/profile.component';
 
 import { AuthGuard } from './guards/auth.guard';
+import { RoleGuard } from './guards/role.guard';
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -22,14 +26,21 @@ const routes: Routes = [
   {
     path: 'organizer',
     component: OrganizerComponent,
-    canActivate: [AuthGuard],
+    canActivate: [AuthGuard, RoleGuard],
+    data: { expectedRole: 'organizer' },
   },
-  { path: 'attendee', component: AttendeeComponent, canActivate: [AuthGuard] },
+  {
+    path: 'attendee',
+    component: AttendeeComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { expectedRole: 'attendee' },
+  },
   { path: 'events', component: EventListComponent },
   {
     path: 'events/create',
     component: EventCreateComponent,
-    canActivate: [AuthGuard],
+    canActivate: [AuthGuard, RoleGuard],
+    data: { expectedRole: 'organizer' },
   },
   { path: 'events/:id', component: EventDetailComponent },
   { path: 'tickets', component: TicketListComponent },
@@ -37,9 +48,15 @@ const routes: Routes = [
   {
     path: 'registrations',
     component: RegistrationListComponent,
-    canActivate: [AuthGuard],
+    canActivate: [AuthGuard, RoleGuard],
+    data: { expectedRole: 'attendee' },
   },
   { path: 'feedback', component: FeedbackListComponent },
+  {
+    path: 'profile',
+    component: ProfileComponent,
+    canActivate: [AuthGuard],
+  },
   { path: '**', redirectTo: '/login' },
 ];
 

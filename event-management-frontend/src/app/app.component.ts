@@ -1,15 +1,12 @@
-// src/app/app.component.ts
-
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css'],
+  imports: [CommonModule, RouterOutlet, ReactiveFormsModule],
+  template: ` <router-outlet></router-outlet> `,
 })
-export class AppComponent {
-  title = 'event-management-frontend';
-}
+export class AppComponent {}

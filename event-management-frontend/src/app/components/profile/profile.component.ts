@@ -1,9 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-profile',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, FormsModule],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css'],
 })
@@ -21,24 +25,36 @@ export class ProfileComponent implements OnInit {
     this.fetchUserProfile();
   }
 
-  /**
-   * Initialize the profile form.
-   */
   private initializeForm(): void {
     this.profileForm = this.fb.group(
       {
-        username: ['', Validators.required],
+        username: ['', [Validators.required, Validators.minLength(3)]],
         email: ['', [Validators.required, Validators.email]],
         password: [''],
         password2: [''],
       },
-      { validator: this.passwordsMatchValidator }
+      { validators: this.passwordMatchValidator }
     );
   }
 
-  /**
-   * Fetch the current user's profile from the backend.
-   */
+  private passwordMatchValidator(
+    group: FormGroup
+  ): { [key: string]: any } | null {
+    const password = group.get('password');
+    const password2 = group.get('password2');
+
+    if (
+      password?.value &&
+      password2?.value &&
+      password.value !== password2.value
+    ) {
+      password2?.setErrors({ mismatch: true });
+      return { passwordsMismatch: true };
+    }
+
+    return null;
+  }
+
   private fetchUserProfile(): void {
     this.isLoading = true;
     this.authService.getProfile().subscribe({
@@ -50,35 +66,32 @@ export class ProfileComponent implements OnInit {
         this.isLoading = false;
       },
       error: (error) => {
-        this.errorMessage = error;
+        this.errorMessage = error.message || 'Failed to fetch profile';
         this.isLoading = false;
       },
     });
   }
 
-  /**
-   * Handle form submission to update the profile.
-   */
   onSubmit(): void {
     if (this.profileForm.invalid) {
-      this.errorMessage = 'Please fill in the required fields correctly.';
-      this.successMessage = '';
+      Object.keys(this.profileForm.controls).forEach((key) => {
+        const control = this.profileForm.get(key);
+        if (control?.invalid) {
+          control.markAsTouched();
+        }
+      });
       return;
     }
 
     const { username, email, password, password2 } = this.profileForm.value;
 
-    const updatedData: any = {
-      username,
-      email,
-    };
+    const updatedData: any = { username, email };
 
     if (password) {
       updatedData.password = password;
     }
 
     this.isLoading = true;
-
     this.authService.updateProfile(updatedData).subscribe({
       next: () => {
         this.successMessage = 'Profile updated successfully.';
@@ -86,47 +99,27 @@ export class ProfileComponent implements OnInit {
         this.isLoading = false;
       },
       error: (error) => {
-        this.errorMessage = error;
+        this.errorMessage = error.message || 'Failed to update profile';
         this.successMessage = '';
         this.isLoading = false;
       },
     });
   }
 
-  /**
-   * Toggle password visibility.
-   */
   togglePasswordVisibility(): void {
     this.hidePassword = !this.hidePassword;
   }
 
-  /**
-   * Custom validator to check if passwords match.
-   */
-  private passwordsMatchValidator(
-    group: FormGroup
-  ): { [key: string]: boolean } | null {
-    const password = group.get('password')?.value;
-    const password2 = group.get('password2')?.value;
-    if (password && password2 && password !== password2) {
-      return { passwordsMismatch: true };
-    }
-    return null;
-  }
-
-  // Getter methods for form controls
+  // Getters for easy access in template
   get username() {
     return this.profileForm.get('username');
   }
-
   get email() {
     return this.profileForm.get('email');
   }
-
   get password() {
     return this.profileForm.get('password');
   }
-
   get password2() {
     return this.profileForm.get('password2');
   }
