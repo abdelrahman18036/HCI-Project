@@ -1,26 +1,19 @@
 // src/app/components/auth/login/login.component.ts
 
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import {
-  ReactiveFormsModule,
-  FormBuilder,
-  FormGroup,
-  Validators,
-} from '@angular/forms';
-import { AuthService } from '../../../services/auth.service';
 import { Router } from '@angular/router';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-login',
-  standalone: true,
-  imports: [ReactiveFormsModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
 })
 export class LoginComponent {
   loginForm: FormGroup;
   errorMessage: string = '';
+  isLoading: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -34,6 +27,12 @@ export class LoginComponent {
   }
 
   onSubmit(): void {
+    if (this.loginForm.invalid) {
+      this.errorMessage = 'Please enter your username and password.';
+      return;
+    }
+
+    this.isLoading = true;
     this.authService.login(this.loginForm.value).subscribe({
       next: (res: any) => {
         this.authService.setToken(res);
@@ -43,10 +42,21 @@ export class LoginComponent {
         } else {
           this.router.navigate(['/attendee']);
         }
+        this.isLoading = false;
       },
       error: (err) => {
-        this.errorMessage = err.error.error;
+        this.errorMessage = err;
+        this.isLoading = false;
       },
     });
+  }
+
+  // Getter methods for form controls
+  get username() {
+    return this.loginForm.get('username');
+  }
+
+  get password() {
+    return this.loginForm.get('password');
   }
 }

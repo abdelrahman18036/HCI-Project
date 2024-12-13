@@ -24,14 +24,16 @@ export class EventDetailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const eventId = this.route.snapshot.paramMap.get('id');
-    if (eventId) {
-      this.eventService.getEventById(eventId).subscribe({
-        next: (data) => {
+    const eventIdParam = this.route.snapshot.paramMap.get('id');
+    const eventId = eventIdParam ? +eventIdParam : null;
+
+    if (eventId !== null) {
+      this.eventService.getEvent(eventId).subscribe({
+        next: (data: any) => {
           this.event = data;
           this.isLoading = false;
         },
-        error: (err) => {
+        error: (err: any) => {
           this.error = 'Error fetching event details.';
           this.isLoading = false;
         },

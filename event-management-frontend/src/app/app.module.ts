@@ -1,3 +1,5 @@
+// src/app/app.module.ts
+
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
@@ -17,6 +19,7 @@ import { TicketListComponent } from './components/tickets/ticket-list/ticket-lis
 import { TicketDetailComponent } from './components/tickets/ticket-detail/ticket-detail.component';
 import { RegistrationListComponent } from './components/registrations/registration-list/registration-list.component';
 import { FeedbackListComponent } from './components/feedback/feedback-list/feedback-list.component';
+import { ProfileComponent } from './components/profile/profile.component';
 
 import { AuthService } from './services/auth.service';
 import { EventService } from './services/event.service';
@@ -25,6 +28,7 @@ import { RegistrationService } from './services/registration.service';
 import { FeedbackService } from './services/feedback.service';
 
 import { AuthGuard } from './guards/auth.guard';
+import { AuthInterceptorService } from './services/auth-interceptor.service';
 
 @NgModule({
   declarations: [
@@ -40,12 +44,13 @@ import { AuthGuard } from './guards/auth.guard';
     TicketDetailComponent,
     RegistrationListComponent,
     FeedbackListComponent,
+    ProfileComponent,
   ],
   imports: [
-    BrowserModule,
+    BrowserModule, // Keep BrowserModule here
     AppRoutingModule,
     HttpClientModule,
-    ReactiveFormsModule,
+    ReactiveFormsModule, // Keep ReactiveFormsModule here
   ],
   providers: [
     AuthService,
@@ -54,6 +59,11 @@ import { AuthGuard } from './guards/auth.guard';
     RegistrationService,
     FeedbackService,
     AuthGuard,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptorService,
+      multi: true,
+    },
   ],
   bootstrap: [AppComponent],
 })

@@ -120,3 +120,11 @@ class AttendeeRegistrationListView(generics.ListAPIView):
 
     def get_queryset(self):
         return Registration.objects.filter(attendee=self.request.user)
+
+# User Profile View
+class UserProfileView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user

@@ -3,7 +3,11 @@
 <div class="min-h-screen bg-gray-900 text-white">
     <nav class="flex justify-between items-center p-4 bg-gray-800">
         <h1 class="text-xl">Organizer Dashboard</h1>
-        <button (click)="logout()" class="px-3 py-1 bg-red-600 rounded">Logout</button>
+        <div class="flex space-x-4">
+            <a routerLink="/events" class="text-gray-300 hover:text-white">Events</a>
+            <a routerLink="/profile" class="text-gray-300 hover:text-white">Profile</a>
+            <button (click)="logout()" class="text-gray-300 hover:text-white">Logout</button>
+        </div>
     </nav>
     <div class="p-4">
         <router-outlet></router-outlet>

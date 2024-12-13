@@ -1,0 +1,25 @@
+<!-- src/app/components/nav-bar/nav-bar.component.html -->
+
+<nav class="bg-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+            <div class="flex items-center">
+                <a routerLink="/" class="text-white text-xl font-bold">EventManager</a>
+                <div class="ml-10 flex items-baseline space-x-4">
+                    <a routerLink="/events"
+                        class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Events</a>
+                    <a routerLink="/profile"
+                        class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Profile</a>
+                    <!-- Add more links as needed -->
+                </div>
+            </div>
+            <div class="flex">
+                <a routerLink="/login"
+                    class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Login</a>
+                <a routerLink="/signup"
+                    class="ml-4 text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Sign
+                    Up</a>
+            </div>
+        </div>
+    </div>
+</nav>
