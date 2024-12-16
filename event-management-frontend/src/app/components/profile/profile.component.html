@@ -1,8 +1,57 @@
+<!-- src/app/components/profile/profile.component.html -->
+
+<nav class="flex justify-between items-center p-4 bg-gray-800 mb-4">
+    <h2 class="text-3xl text-white">My Profile</h2>
+    <div class="flex space-x-4">
+        <a routerLink="/events" class="text-gray-300 hover:text-white">Events</a>
+        <a routerLink="/profile" class="text-gray-300 hover:text-white">Profile</a>
+        <button (click)="logout()" class="text-gray-300 hover:text-white">Logout</button>
+    </div>
+</nav>
+
 <div class="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
     <div class="w-full max-w-md p-8 space-y-6 rounded-xl bg-white dark:bg-gray-800 shadow-lg">
         <h1 class="text-3xl font-bold text-center text-gray-800 dark:text-white">Profile</h1>
 
-        <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="space-y-4">
+        <!-- Display Mode -->
+        <div *ngIf="!isEditing && !isLoading && !errorMessage">
+            <div class="flex justify-center mb-4">
+                <img *ngIf="userProfile?.profile_image" [src]="userProfile?.profile_image" alt="Profile Image"
+                    class="w-24 h-24 rounded-full object-cover">
+                <div *ngIf="!userProfile?.profile_image"
+                    class="w-24 h-24 rounded-full bg-gray-700 flex items-center justify-center text-gray-300">
+                    No Image
+                </div>
+            </div>
+            <div class="space-y-2">
+                <div>
+                    <span class="font-semibold text-gray-700 dark:text-gray-300">Username:</span>
+                    <span class="text-gray-800 dark:text-gray-200"> {{ userProfile?.username }}</span>
+                </div>
+                <div>
+                    <span class="font-semibold text-gray-700 dark:text-gray-300">Email:</span>
+                    <span class="text-gray-800 dark:text-gray-200"> {{ userProfile?.email }}</span>
+                </div>
+
+            </div>
+            <button (click)="onEdit()"
+                class="w-full mt-6 py-2 px-4 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold rounded-lg shadow">
+                Edit Profile
+            </button>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div *ngIf="isLoading" class="flex justify-center items-center">
+            <p class="text-gray-300">Loading...</p>
+        </div>
+
+        <!-- Error Message -->
+        <div *ngIf="errorMessage && !isEditing" class="mb-4 text-red-500 text-center">
+            {{ errorMessage }}
+        </div>
+
+        <!-- Edit Mode -->
+        <form *ngIf="isEditing" [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="space-y-4">
             <!-- Username Field -->
             <div>
                 <label class="block mb-1 text-gray-600 dark:text-gray-300">Username</label>
@@ -25,6 +74,14 @@
                 <div *ngIf="email?.invalid && (email?.dirty || email?.touched)" class="text-red-500 text-sm mt-1">
                     A valid email is required.
                 </div>
+            </div>
+
+            <!-- Profile Image URL Field -->
+            <div>
+                <label class="block mb-1 text-gray-600 dark:text-gray-300">Profile Image URL</label>
+                <input type="text" formControlName="profile_image"
+                    class="w-full px-4 py-2 border rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter image URL" />
             </div>
 
             <!-- Password Field -->
@@ -65,19 +122,25 @@
                 </div>
             </div>
 
-            <!-- Submit Button -->
-            <button type="submit"
-                class="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors duration-300 disabled:opacity-50"
-                [disabled]="isLoading">
-                {{ isLoading ? 'Updating...' : 'Update Profile' }}
-            </button>
+            <!-- Submit and Cancel Buttons -->
+            <div class="flex space-x-4">
+                <button type="submit"
+                    class="flex-1 py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow transition-colors duration-300 disabled:opacity-50">
+                    {{ isLoading ? 'Updating...' : 'Update Profile' }}
+                </button>
+                <button type="button"
+                    class="flex-1 py-2 px-4 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg shadow transition-colors duration-300"
+                    (click)="onCancel()">
+                    Cancel
+                </button>
+            </div>
         </form>
 
         <!-- Success and Error Messages -->
         <div *ngIf="successMessage" class="text-green-500 text-center">
             {{ successMessage }}
         </div>
-        <div *ngIf="errorMessage" class="text-red-500 text-center">
+        <div *ngIf="errorMessage && isEditing" class="text-red-500 text-center">
             {{ errorMessage }}
         </div>
     </div>

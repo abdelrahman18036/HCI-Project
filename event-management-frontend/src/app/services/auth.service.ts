@@ -26,6 +26,7 @@ interface LoginResponse {
 }
 
 interface UserProfile {
+  profile_image?: string;
   id: number;
   username: string;
   email: string;
@@ -73,9 +74,10 @@ export class AuthService {
   setToken(token: LoginResponse): void {
     localStorage.setItem('currentUser', JSON.stringify(token));
     this.currentUserSubject.next({
-      id: 0, // Placeholder, can be updated by fetching profile
+      id: 0, // Placeholder; ideally fetched from profile
       username: token.username,
-      email: '', // Placeholder, can be updated by fetching profile
+      profile_image: '', // Placeholder; ideally fetched from profile
+      email: '', // Placeholder; ideally fetched from profile
       user_type: token.user_type,
     });
   }
@@ -106,7 +108,7 @@ export class AuthService {
         }),
         catchError(this.handleError)
       );
-  }
+  } // login.component.ts
 
   /**
    * Update the current user's profile.
@@ -127,7 +129,6 @@ export class AuthService {
         catchError(this.handleError)
       );
   }
-
   /**
    * Handle HTTP errors.
    * @param error

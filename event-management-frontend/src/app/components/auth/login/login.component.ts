@@ -30,6 +30,7 @@ export class LoginComponent {
     });
   }
 
+  // login.component.ts
   onSubmit(): void {
     if (this.loginForm.invalid) {
       this.errorMessage = 'Please enter your username and password.';
@@ -40,14 +41,22 @@ export class LoginComponent {
     this.authService.login(this.loginForm.value).subscribe({
       next: (res: any) => {
         this.isLoading = false;
-        // Redirect based on user type
-        if (res.user_type === 'organizer') {
-          this.router.navigate(['/organizer']);
-        } else if (res.user_type === 'attendee') {
-          this.router.navigate(['/attendee']);
-        } else {
-          this.errorMessage = 'Invalid user type.';
-        }
+        // Fetch user profile to update currentUserSubject
+        this.authService.getProfile().subscribe({
+          next: () => {
+            // Redirect based on user type
+            if (res.user_type === 'organizer') {
+              this.router.navigate(['/organizer']);
+            } else if (res.user_type === 'attendee') {
+              this.router.navigate(['/attendee']);
+            } else {
+              this.errorMessage = 'Invalid user type.';
+            }
+          },
+          error: (err) => {
+            this.errorMessage = 'Failed to fetch user profile.';
+          },
+        });
       },
       error: (err: any) => {
         this.errorMessage = err;

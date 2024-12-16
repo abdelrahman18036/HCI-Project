@@ -3,6 +3,9 @@
 from rest_framework import serializers
 from .models import User, Event, Ticket, Registration, Feedback
 from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 # User Serializer
 class UserSerializer(serializers.ModelSerializer):
@@ -11,7 +14,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'password', 'password2', 'email', 'user_type')
+        fields = ('id', 'username', 'password', 'password2', 'email', 'user_type', 'profile_image')
         extra_kwargs = {
             'email': {'required': True},
             'user_type': {'required': True},
@@ -68,13 +71,6 @@ class EventSerializer(serializers.ModelSerializer):
         attendees = [registration.attendee for registration in registrations]
         return AttendeeSerializer(attendees, many=True).data
 
-# Registration Serializer
-class RegistrationSerializer(serializers.ModelSerializer):
-    attendee = serializers.ReadOnlyField(source='attendee.username')
-
-    class Meta:
-        model = Registration
-        fields = '__all__'
 
 # Feedback Serializer
 class FeedbackSerializer(serializers.ModelSerializer):
@@ -89,3 +85,14 @@ class AttendeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'email']
+
+
+# Registration Serializer
+class RegistrationSerializer(serializers.ModelSerializer):
+    attendee = AttendeeSerializer(read_only=True)
+    event = EventSerializer(read_only=True)
+    ticket = TicketSerializer(read_only=True)
+
+    class Meta:
+        model = Registration
+        fields = ['id', 'attendee', 'registered_at', 'event', 'ticket']

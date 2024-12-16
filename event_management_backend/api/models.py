@@ -8,6 +8,7 @@ class User(AbstractUser):
         ('attendee', 'Attendee'),
     )
     user_type = models.CharField(max_length=10, choices=USER_TYPE_CHOICES)
+    profile_image = models.URLField(max_length=200, blank=True, null=True)
 
     def __str__(self):
         return self.username

@@ -5,6 +5,7 @@ import { EventService } from '../../../services/event.service';
 import { AuthService } from '../../../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-event-list',
@@ -21,7 +22,8 @@ export class EventListComponent implements OnInit {
 
   constructor(
     private eventService: EventService,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -41,5 +43,10 @@ export class EventListComponent implements OnInit {
         this.isLoading = false;
       },
     });
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
 }
