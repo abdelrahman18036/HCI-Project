@@ -8,8 +8,9 @@ import {
 } from '../../services/analytics.service';
 import { ChartModule } from 'primeng/chart';
 import { TableModule } from 'primeng/table';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-organizer-analytics',
@@ -27,7 +28,11 @@ export class OrganizerAnalyticsComponent implements OnInit {
   pieData: any;
   pieOptions: any;
 
-  constructor(private analyticsService: AnalyticsService) {}
+  constructor(
+    private analyticsService: AnalyticsService,
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.fetchAnalytics();
@@ -81,6 +86,7 @@ export class OrganizerAnalyticsComponent implements OnInit {
   }
 
   logout(): void {
-    // Implement logout logic
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
 }
