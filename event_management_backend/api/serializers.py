@@ -1,7 +1,7 @@
 # your_app/serializers.py
 
 from rest_framework import serializers
-from .models import TicketType, User, Event, Ticket, Registration, Feedback
+from .models import TicketType, User, Event, Ticket, Registration, Feedback, Comment
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth import get_user_model
 import json
@@ -186,3 +186,24 @@ class FeedbackSerializer(serializers.ModelSerializer):
         # Assuming that the `validated_data` will have the 'event' and 'attendee' is filled correctly
         validated_data['attendee'] = user
         return Feedback.objects.create(**validated_data)
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    attendee = AttendeeSerializer(read_only=True)
+    event = serializers.PrimaryKeyRelatedField(
+        queryset=Event.objects.all(),
+        write_only=True,
+        required=False  # Make event optional
+    )
+
+    class Meta:
+        model = Comment
+        fields = ['id', 'event', 'attendee', 'content', 'created_at']
+        read_only_fields = ['id', 'attendee', 'created_at']
+
+    def create(self, validated_data):
+        user = self.context['request'].user
+        validated_data['attendee'] = user
+        # 'event' will be set in the view
+        return Comment.objects.create(**validated_data)
+

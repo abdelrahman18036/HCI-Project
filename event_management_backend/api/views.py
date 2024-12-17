@@ -1,9 +1,9 @@
 # your_app/views.py
 
 from rest_framework import generics, permissions, status
-from .models import User, Event, Ticket, TicketType, Registration, Feedback
+from .models import User, Event, Ticket, TicketType, Registration, Feedback, Comment
 from .serializers import (
-    AttendeeSerializer, UserSerializer, EventSerializer, 
+    AttendeeSerializer, CommentSerializer, UserSerializer, EventSerializer, 
     TicketSerializer, TicketTypeSerializer, RegistrationSerializer, FeedbackSerializer
 )
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -166,3 +166,15 @@ class AttendeeRegistrationListView(generics.ListAPIView):
 
     def get_queryset(self):
         return Registration.objects.filter(attendee=self.request.user)
+
+
+class CommentListCreateView(generics.ListCreateAPIView):
+    serializer_class = CommentSerializer
+
+    def get_queryset(self):
+        event_id = self.kwargs.get('event_id')
+        return Comment.objects.filter(event_id=event_id).order_by('-created_at')
+
+    def perform_create(self, serializer):
+        event_id = self.kwargs.get('event_id')
+        serializer.save(attendee=self.request.user, event_id=event_id)

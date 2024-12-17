@@ -10,7 +10,7 @@ import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { EventFeedbackComponent } from '../event-feedback/event-feedback.component';
-
+import { EventCommentsComponent } from '../event-comments/event-comments.component';
 interface Ticket {
   id: number;
   ticket_type: string;
@@ -56,6 +56,7 @@ interface Profile {
     ReactiveFormsModule,
     RouterModule,
     EventFeedbackComponent,
+    EventCommentsComponent,
   ],
   templateUrl: './event-detail.component.html',
   styleUrls: ['./event-detail.component.css'],

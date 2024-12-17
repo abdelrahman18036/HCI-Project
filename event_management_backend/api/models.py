@@ -71,3 +71,11 @@ class Registration(models.Model):
     def __str__(self):
         return f"{self.attendee.username} - {self.event.title}"
 
+class Comment(models.Model):
+    event = models.ForeignKey(Event, related_name='comments', on_delete=models.CASCADE)
+    attendee = models.ForeignKey(User, related_name='comments', on_delete=models.CASCADE)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Comment by {self.attendee.username} on {self.event.title}'
