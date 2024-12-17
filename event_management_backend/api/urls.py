@@ -4,7 +4,7 @@ from .views import (
     EventListCreateView, EventRetrieveUpdateDestroyView,
     TicketListCreateView, TicketRetrieveUpdateDestroyView,
     RegistrationListCreateView, FeedbackListCreateView,
-    OrganizerEventListView, AttendeeRegistrationListView, UserProfileView
+    OrganizerEventListView, AttendeeRegistrationListView, UserProfileView, TicketTypeListView
 )
 from rest_framework_simplejwt.views import TokenRefreshView
 
@@ -37,5 +37,7 @@ urlpatterns = [
     # User Profile
     path('profile/', UserProfileView.as_view(), name='profile'),
     path('events/<int:event_id>/attendees/', EventAttendeesListView.as_view(), name='event-attendees-list'),  # New route
+    path('ticket-types/', TicketTypeListView.as_view(), name='ticket-type-list'),  # New endpoint
+
 
 ]

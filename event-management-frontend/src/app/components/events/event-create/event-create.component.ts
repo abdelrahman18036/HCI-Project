@@ -1,3 +1,5 @@
+// src/app/components/events/event-create/event-create.component.ts
+
 import { Component, OnInit } from '@angular/core';
 import {
   FormBuilder,
@@ -10,6 +12,7 @@ import { EventService } from '../../../services/event.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+
 @Component({
   selector: 'app-event-create',
   standalone: true,
@@ -25,6 +28,17 @@ export class EventCreateComponent implements OnInit {
   successMessage: string = '';
   errorMessage: string = '';
 
+  // Variables to hold selected files
+  selectedPromotionalImage: File | null = null;
+  selectedPromotionalVideo: File | null = null;
+
+  // Variables to hold existing image/video URLs
+  existingPromotionalImage: string | null = null;
+  existingPromotionalVideo: string | null = null;
+
+  // Ticket Types fetched from backend
+  ticketTypes: any[] = [];
+
   constructor(
     private fb: FormBuilder,
     private eventService: EventService,
@@ -34,8 +48,10 @@ export class EventCreateComponent implements OnInit {
 
   ngOnInit(): void {
     this.initializeForm();
-    this.eventId = Number(this.route.snapshot.paramMap.get('id'));
-    if (this.eventId) {
+    this.fetchTicketTypes(); // Fetch ticket types on init
+    const idParam = this.route.snapshot.paramMap.get('id');
+    if (idParam) {
+      this.eventId = Number(idParam);
       this.isEditing = true;
       this.loadEvent();
     }
@@ -50,8 +66,6 @@ export class EventCreateComponent implements OnInit {
       location: ['', Validators.required],
       category: ['', Validators.required],
       ticket_price: [0, [Validators.required, Validators.min(0)]],
-      promotional_image: [''],
-      promotional_video: [''],
       is_promotion: [false],
       tickets: this.fb.array([this.createTicketGroup()]),
     });
@@ -59,7 +73,7 @@ export class EventCreateComponent implements OnInit {
 
   private createTicketGroup(): FormGroup {
     return this.fb.group({
-      ticket_type: ['', Validators.required],
+      ticket_type: [null, Validators.required], // Changed to null for select
       price: [0, [Validators.required, Validators.min(0)]],
       quantity: [0, [Validators.required, Validators.min(1)]],
     });
@@ -91,17 +105,19 @@ export class EventCreateComponent implements OnInit {
           location: event.location,
           category: event.category,
           ticket_price: event.ticket_price,
-          promotional_image: event.promotional_image,
-          promotional_video: event.promotional_video,
           is_promotion: event.is_promotion,
         });
+
+        // Store existing promotional image and video URLs
+        this.existingPromotionalImage = event.promotional_image;
+        this.existingPromotionalVideo = event.promotional_video;
 
         // Clear existing tickets and set fetched tickets
         this.tickets.clear();
         event.tickets.forEach((ticket: any) => {
           this.tickets.push(
             this.fb.group({
-              ticket_type: [ticket.ticket_type, Validators.required],
+              ticket_type: ticket.ticket_type, // Assuming it's the TicketType ID
               price: [ticket.price, [Validators.required, Validators.min(0)]],
               quantity: [
                 ticket.quantity,
@@ -120,51 +136,97 @@ export class EventCreateComponent implements OnInit {
     });
   }
 
+  onPromotionalImageChange(event: any): void {
+    if (event.target.files && event.target.files.length) {
+      this.selectedPromotionalImage = event.target.files[0];
+    }
+  }
+
+  onPromotionalVideoChange(event: any): void {
+    if (event.target.files && event.target.files.length) {
+      this.selectedPromotionalVideo = event.target.files[0];
+    }
+  }
+
+  private fetchTicketTypes(): void {
+    this.eventService.getTicketTypes().subscribe({
+      next: (types) => {
+        this.ticketTypes = types;
+      },
+      error: (err) => {
+        console.error('Failed to fetch ticket types.', err);
+      },
+    });
+  }
+
   onSubmit(): void {
     if (this.eventForm.invalid) {
+      this.errorMessage = 'Please fill out all required fields correctly.';
       return;
     }
 
     this.isLoading = true;
     const eventData = this.eventForm.value;
 
-    // Separate tickets from event data
-    const tickets = eventData.tickets;
-    delete eventData.tickets;
+    // Create FormData
+    const formData = new FormData();
+
+    // Append simple fields
+    formData.append('title', eventData.title);
+    formData.append('description', eventData.description);
+    formData.append('date', eventData.date);
+    formData.append('time', eventData.time);
+    formData.append('location', eventData.location);
+    formData.append('category', eventData.category);
+    formData.append('ticket_price', eventData.ticket_price.toString());
+    formData.append('is_promotion', eventData.is_promotion.toString());
+
+    // Append files if selected
+    if (this.selectedPromotionalImage) {
+      formData.append('promotional_image', this.selectedPromotionalImage);
+    }
+
+    if (this.selectedPromotionalVideo) {
+      formData.append('promotional_video', this.selectedPromotionalVideo);
+    }
+
+    // Append tickets as JSON string
+    formData.append('tickets_data', JSON.stringify(eventData.tickets));
+
+    console.log('Submitting Tickets:', eventData.tickets);
 
     if (this.isEditing) {
-      this.eventService.updateEvent(this.eventId, eventData).subscribe({
+      this.eventService.updateEvent(this.eventId, formData).subscribe({
         next: () => {
-          // Optionally, update tickets here
-          // For simplicity, assuming backend handles ticket updates via nested serializers
           this.successMessage = 'Event updated successfully.';
           this.errorMessage = '';
           this.isLoading = false;
           this.router.navigate(['/organizer']);
         },
         error: (err) => {
-          this.errorMessage = 'Failed to update event.';
+          if (err.error) {
+            this.errorMessage = JSON.stringify(err.error);
+          } else {
+            this.errorMessage = 'Failed to update event.';
+          }
           this.successMessage = '';
           this.isLoading = false;
         },
       });
     } else {
-      this.eventService.createEvent(eventData).subscribe({
+      this.eventService.createEvent(formData).subscribe({
         next: (createdEvent) => {
-          // Create tickets for the newly created event
-          tickets.forEach((ticket: any) => {
-            this.eventService.createTicket(createdEvent.id, ticket).subscribe({
-              next: () => {},
-              error: () => {},
-            });
-          });
           this.successMessage = 'Event created successfully.';
           this.errorMessage = '';
           this.isLoading = false;
           this.router.navigate(['/organizer']);
         },
         error: (err) => {
-          this.errorMessage = 'Failed to create event.';
+          if (err.error) {
+            this.errorMessage = JSON.stringify(err.error);
+          } else {
+            this.errorMessage = 'Failed to create event.';
+          }
           this.successMessage = '';
           this.isLoading = false;
         },

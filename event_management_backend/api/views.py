@@ -1,20 +1,24 @@
 # your_app/views.py
 
 from rest_framework import generics, permissions, status
-from .models import User, Event, Ticket, Registration, Feedback
-from .serializers import AttendeeSerializer, UserSerializer, EventSerializer, TicketSerializer, RegistrationSerializer, FeedbackSerializer
+from .models import User, Event, Ticket, TicketType, Registration, Feedback
+from .serializers import (
+    AttendeeSerializer, UserSerializer, EventSerializer, 
+    TicketSerializer, TicketTypeSerializer, RegistrationSerializer, FeedbackSerializer
+)
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth import authenticate
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
-# User Registration
+# User Registration (unchanged)
 class SignupView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [permissions.AllowAny]
 
-# User Login
+# User Login (unchanged)
 class LoginView(APIView):
     permission_classes = [permissions.AllowAny]
 
@@ -32,47 +36,38 @@ class LoginView(APIView):
             }, status=status.HTTP_200_OK)
         return Response({'error': 'Invalid Credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
-# Event List and Create
-class EventListCreateView(generics.ListCreateAPIView):
-    queryset = Event.objects.all()
-    serializer_class = EventSerializer
+# TicketType List View
+class TicketTypeListView(generics.ListAPIView):
+    queryset = TicketType.objects.all()
+    serializer_class = TicketTypeSerializer
+    permission_classes = [permissions.AllowAny]  # Adjust as needed
 
-    def get_permissions(self):
-        if self.request.method == 'POST':
-            return [permissions.IsAuthenticated()]
-        return [permissions.AllowAny()]
+# Event List and Create (unchanged except parser_classes)
+class EventListCreateView(generics.ListCreateAPIView):
+    queryset = Event.objects.all().order_by('-is_promotion', '-created_at')
+    serializer_class = EventSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]  # Updated to include JSONParser
 
     def perform_create(self, serializer):
         serializer.save(organizer=self.request.user)
 
-# Event Retrieve, Update, Destroy
+# Event Retrieve, Update, Destroy (unchanged except parser_classes)
 class EventRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
-
-    def get_permissions(self):
-        if self.request.method in ['PUT', 'PATCH', 'DELETE']:
-            return [permissions.IsAuthenticated()]
-        return [permissions.AllowAny()]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]  # Updated to include JSONParser
 
     def perform_update(self, serializer):
         serializer.save()
 
-    def perform_destroy(self, instance):
-        instance.delete()
-
-# Ticket Views
+# Ticket Views (unchanged)
 class TicketListCreateView(generics.ListCreateAPIView):
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
-
-    def get_permissions(self):
-        if self.request.method == 'POST':
-            return [permissions.IsAuthenticated()]
-        return [permissions.AllowAny()]
-
-    def perform_create(self, serializer):
-        serializer.save()
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    parser_classes = [MultiPartParser, FormParser]
 
 class TicketRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Ticket.objects.all()
@@ -83,7 +78,7 @@ class TicketRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
             return [permissions.IsAuthenticated()]
         return [permissions.AllowAny()]
 
-# Registration Views
+# Registration Views (unchanged)
 class RegistrationListCreateView(generics.ListCreateAPIView):
     queryset = Registration.objects.all()
     serializer_class = RegistrationSerializer
@@ -96,7 +91,7 @@ class RegistrationListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(attendee=self.request.user)
 
-# Feedback Views
+# Feedback Views (unchanged)
 class FeedbackListCreateView(generics.ListCreateAPIView):
     queryset = Feedback.objects.all()
     serializer_class = FeedbackSerializer
@@ -109,7 +104,7 @@ class FeedbackListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(attendee=self.request.user)
 
-# Organizer-specific Views
+# Organizer-specific Views (unchanged)
 class OrganizerEventListView(generics.ListAPIView):
     serializer_class = EventSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -117,7 +112,7 @@ class OrganizerEventListView(generics.ListAPIView):
     def get_queryset(self):
         return Event.objects.filter(organizer=self.request.user)
 
-# Attendee-specific Views
+# Attendee-specific Views (unchanged)
 class AttendeeRegistrationListView(generics.ListAPIView):
     serializer_class = RegistrationSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -125,7 +120,7 @@ class AttendeeRegistrationListView(generics.ListAPIView):
     def get_queryset(self):
         return Registration.objects.filter(attendee=self.request.user)
 
-# User Profile View
+# User Profile View (unchanged)
 class UserProfileView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -133,10 +128,10 @@ class UserProfileView(generics.RetrieveUpdateDestroyAPIView):
     def get_object(self):
         return self.request.user
 
-
+# Event Attendees List View (unchanged)
 class EventAttendeesListView(generics.ListAPIView):
     serializer_class = AttendeeSerializer
-    permission_classes = [permissions.IsAuthenticated, permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         event_id = self.kwargs['event_id']

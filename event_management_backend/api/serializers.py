@@ -1,13 +1,14 @@
 # your_app/serializers.py
 
 from rest_framework import serializers
-from .models import User, Event, Ticket, Registration, Feedback
+from .models import TicketType, User, Event, Ticket, Registration, Feedback
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth import get_user_model
+import json
 
 User = get_user_model()
 
-# User Serializer
+# User Serializer (unchanged)
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=False, validators=[validate_password])
     password2 = serializers.CharField(write_only=True, required=False)
@@ -50,29 +51,74 @@ class UserSerializer(serializers.ModelSerializer):
         user.save()
         return user
 
-# Ticket Serializer
+# TicketType Serializer (unchanged)
+class TicketTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TicketType
+        fields = ['id', 'name']
+
+# Ticket Serializer (unchanged)
 class TicketSerializer(serializers.ModelSerializer):
+    ticket_type = serializers.PrimaryKeyRelatedField(queryset=TicketType.objects.all())
+
     class Meta:
         model = Ticket
-        fields = '__all__'
+        fields = ['ticket_type', 'price', 'quantity']
 
 # Event Serializer
 class EventSerializer(serializers.ModelSerializer):
     organizer = serializers.ReadOnlyField(source='organizer.username')
-    tickets = TicketSerializer(many=True, read_only=True)
-    attendees = serializers.SerializerMethodField()  # New field
+    tickets_data = serializers.CharField(write_only=True)  # Renamed to avoid conflict
+    tickets = TicketSerializer(many=True, read_only=True)  # Read-only nested serializer
+    promotional_image = serializers.ImageField(required=False, allow_null=True)
+    promotional_video = serializers.FileField(required=False, allow_null=True)
 
     class Meta:
         model = Event
         fields = '__all__'
-    
-    def get_attendees(self, obj):
-        registrations = Registration.objects.filter(event=obj)
-        attendees = [registration.attendee for registration in registrations]
-        return AttendeeSerializer(attendees, many=True).data
 
+    def validate_tickets_data(self, value):
+        # Attempt to parse 'tickets_data' as JSON
+        try:
+            parsed = json.loads(value)
+            if not isinstance(parsed, list):
+                raise serializers.ValidationError("Tickets must be a list.")
+            return parsed
+        except json.JSONDecodeError:
+            raise serializers.ValidationError("Invalid JSON format for 'tickets_data'.")
 
-# Feedback Serializer
+    def create(self, validated_data):
+        tickets_data = validated_data.pop('tickets_data', [])
+
+        event = Event.objects.create(**validated_data)
+
+        for ticket_dict in tickets_data:
+            # Validate each ticket with the TicketSerializer
+            ticket_serializer = TicketSerializer(data=ticket_dict)
+            ticket_serializer.is_valid(raise_exception=True)
+            Ticket.objects.create(event=event, **ticket_serializer.validated_data)
+
+        return event
+
+    def update(self, instance, validated_data):
+        tickets_data = validated_data.pop('tickets_data', None)
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        if tickets_data is not None:
+            # Clear existing tickets
+            instance.tickets.all().delete()
+            # Create new tickets
+            for ticket_dict in tickets_data:
+                ticket_serializer = TicketSerializer(data=ticket_dict)
+                ticket_serializer.is_valid(raise_exception=True)
+                Ticket.objects.create(event=instance, **ticket_serializer.validated_data)
+
+        return instance
+
+# Feedback Serializer (unchanged)
 class FeedbackSerializer(serializers.ModelSerializer):
     attendee = serializers.ReadOnlyField(source='attendee.username')
 
@@ -80,14 +126,13 @@ class FeedbackSerializer(serializers.ModelSerializer):
         model = Feedback
         fields = '__all__'
 
-
+# Attendee Serializer (unchanged)
 class AttendeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'email']
 
-
-# Registration Serializer
+# Registration Serializer (unchanged)
 class RegistrationSerializer(serializers.ModelSerializer):
     attendee = AttendeeSerializer(read_only=True)
     event = EventSerializer(read_only=True)

@@ -1,3 +1,5 @@
+# your_app/models.py
+
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
@@ -13,6 +15,13 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
 
+# TicketType Model
+class TicketType(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+
+    def __str__(self):
+        return self.name
+
 # Event Model
 class Event(models.Model):
     organizer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='events')
@@ -25,7 +34,7 @@ class Event(models.Model):
     ticket_price = models.DecimalField(max_digits=8, decimal_places=2)
     promotional_image = models.ImageField(upload_to='event_images/', null=True, blank=True)
     promotional_video = models.FileField(upload_to='event_videos/', null=True, blank=True)
-    is_promotion = models.BooleanField(default=False)  # New field
+    is_promotion = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -34,18 +43,14 @@ class Event(models.Model):
 
 # Ticket Model
 class Ticket(models.Model):
-    EVENT_TICKET_TYPES = (
-        ('general', 'General Admission'),
-        ('vip', 'VIP'),
-    )
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='tickets')
-    ticket_type = models.CharField(max_length=20, choices=EVENT_TICKET_TYPES)
+    ticket_type = models.ForeignKey(TicketType, on_delete=models.CASCADE, related_name='tickets')
     price = models.DecimalField(max_digits=8, decimal_places=2)
     quantity = models.PositiveIntegerField()
     sold = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return f"{self.event.title} - {self.ticket_type}"
+        return f"{self.event.title} - {self.ticket_type.name}"
 
 # Registration Model
 class Registration(models.Model):

@@ -45,6 +45,10 @@ export class EventListComponent implements OnInit {
     });
   }
 
+  viewEvent(eventId: number): void {
+    this.router.navigate(['/events', eventId]);
+  }
+
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);
