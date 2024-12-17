@@ -11,6 +11,7 @@ import { EventCreateComponent } from './components/events/event-create/event-cre
 import { TicketListComponent } from './components/tickets/ticket-list/ticket-list.component';
 import { TicketDetailComponent } from './components/tickets/ticket-detail/ticket-detail.component';
 import { RegistrationListComponent } from './components/registrations/registration-list/registration-list.component';
+import { EventEditComponent } from './components/events/event-edit/event-edit.component';
 import { FeedbackListComponent } from './components/feedback/feedback-list/feedback-list.component';
 import { AuthGuard } from './guards/auth.guard';
 
@@ -31,6 +32,11 @@ export const routes: Routes = [
     canActivate: [AuthGuard],
   },
   { path: 'events/:id', component: EventDetailComponent },
+  {
+    path: 'events/:id/edit',
+    component: EventEditComponent,
+    canActivate: [AuthGuard],
+  },
   { path: 'tickets', component: TicketListComponent },
   { path: 'tickets/:id', component: TicketDetailComponent },
   {

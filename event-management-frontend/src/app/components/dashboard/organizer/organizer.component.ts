@@ -1,3 +1,5 @@
+// src/app/components/organizer/organizer.component.ts
+
 import { Component, OnInit } from '@angular/core';
 import { EventService } from '../../../services/event.service';
 import { AuthService } from '../../../services/auth.service';
@@ -44,5 +46,23 @@ export class OrganizerComponent implements OnInit {
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);
+  }
+
+  editEvent(eventId: number): void {
+    this.router.navigate(['/events', eventId, 'edit']);
+  }
+
+  deleteEvent(eventId: number): void {
+    if (confirm('Are you sure you want to delete this event?')) {
+      this.eventService.deleteEvent(eventId).subscribe({
+        next: () => {
+          // Remove the deleted event from the events array
+          this.events = this.events.filter((event) => event.id !== eventId);
+        },
+        error: (err) => {
+          this.errorMessage = 'Failed to delete event.';
+        },
+      });
+    }
   }
 }

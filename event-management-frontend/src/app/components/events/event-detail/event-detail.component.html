@@ -1,87 +1,94 @@
 <!-- src/app/components/events/event-detail/event-detail.component.html -->
 
-<div class="container mx-auto p-6 bg-gray-900 min-h-screen flex flex-col items-center">
+<div class="min-h-screen bg-gray-900 text-white">
+    <nav class="flex justify-between items-center p-4 bg-gray-800">
+        <h1 class="text-xl">Event Details</h1>
+        <div class="flex space-x-4">
+            <a routerLink="/events" class="text-gray-300 hover:text-white">Events</a>
+            <a routerLink="/profile" class="text-gray-300 hover:text-white">Profile</a>
+            <button (click)="logout()" class="text-gray-300 hover:text-white">Logout</button>
+        </div>
+    </nav>
+    <div class="p-4  flex justify-center">
+        <!-- Loading State -->
+        <div *ngIf="isLoading" class="flex justify-center items-center h-full">
+            <p class="text-gray-300">Loading...</p>
+        </div>
 
-    <!-- Loading State -->
-    <div *ngIf="isLoading" class="flex justify-center items-center h-full">
-        <p class="text-gray-300">Loading...</p>
-    </div>
+        <!-- Event Details -->
+        <div *ngIf="!isLoading && event" class="w-full max-w-4xl bg-gray-800 rounded-lg shadow-lg p-8 mt-8">
+            <!-- Event Header -->
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-6">
+                <h1 class="text-4xl font-bold text-white">{{ event.title }}</h1>
+                <div class="flex space-x-4">
+                    <a routerLink="/organizer/events"
+                        class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition">
+                        Back to My Events
+                    </a>
+                    <button (click)="editEvent()"
+                        class="px-4 py-2 bg-yellow-600 text-white rounded-lg shadow hover:bg-yellow-700 transition">
+                        Edit Event
+                    </button>
+                    <button (click)="deleteEvent()"
+                        class="px-4 py-2 bg-red-600 text-white rounded-lg shadow hover:bg-red-700 transition">
+                        Delete Event
+                    </button>
+                </div>
+            </div>
 
-    <!-- Event Details -->
-    <div *ngIf="!isLoading && event" class="w-full max-w-4xl bg-gray-800 rounded-lg shadow-lg p-8 mt-8">
+            <!-- Event Image -->
+            <img [src]="event.promotional_image" alt="{{ event.title }} Image"
+                class="w-full h-64 object-cover rounded-lg mb-6">
 
-        <!-- Event Header -->
-        <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-6">
-            <h1 class="text-4xl font-bold text-white">{{ event.title }}</h1>
-            <div class="flex space-x-4">
-                <a routerLink="/events"
-                    class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition">
-                    Back to Events
-                </a>
-                <button *ngIf="userType === 'organizer'" (click)="editEvent()"
-                    class="px-4 py-2 bg-yellow-600 text-white rounded-lg shadow hover:bg-yellow-700 transition">
-                    Edit Event
+            <!-- Event Details Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <p class="text-gray-300"><strong>Description:</strong> {{ event.description }}</p>
+                <p class="text-gray-300"><strong>Date:</strong> {{ event.date }}</p>
+                <p class="text-gray-300"><strong>Time:</strong> {{ event.time }}</p>
+                <p class="text-gray-300"><strong>Location:</strong> {{ event.location }}</p>
+                <p class="text-gray-300"><strong>Category:</strong> {{ event.category }}</p>
+                <p class="text-gray-300"><strong>Price:</strong> ${{ event.ticket_price }}</p>
+            </div>
+
+            <!-- Promotional Video -->
+            <div *ngIf="event.promotional_video" class="mb-6">
+                <video controls class="w-full h-auto rounded-lg shadow">
+                    <source [src]="event.promotional_video" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+
+            <!-- Booking Section for Attendees -->
+            <div *ngIf="userType === 'attendee'" class="mb-6">
+                <h3 class="text-xl text-white mb-2">Select Ticket Type</h3>
+                <div *ngIf="event.tickets && event.tickets.length > 0" class="mb-4">
+                    <select [(ngModel)]="selectedTicketId" class="w-full px-3 py-2 bg-gray-700 text-white rounded">
+                        <option value="" disabled>Select a ticket</option>
+                        <option *ngFor="let ticket of event.tickets" [value]="ticket.id">
+                            {{ ticket.ticket_type }} - ${{ ticket.price }} ({{ ticket.quantity - ticket.sold }}
+                            available)
+                        </option>
+                    </select>
+                </div>
+                <button (click)="bookEvent()"
+                    class="px-4 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 transition">
+                    Book Event
                 </button>
-                <button *ngIf="userType === 'organizer'" (click)="deleteEvent()"
-                    class="px-4 py-2 bg-red-600 text-white rounded-lg shadow hover:bg-red-700 transition">
-                    Delete Event
-                </button>
+            </div>
+
+            <!-- Success and Error Messages -->
+            <div *ngIf="successMessage" class="mt-4 text-green-500">
+                {{ successMessage }}
+            </div>
+            <div *ngIf="errorMessage" class="mt-4 text-red-500">
+                {{ errorMessage }}
             </div>
         </div>
 
-        <!-- Event Image -->
-        <img [src]="event.promotional_image" alt="{{ event.title }} Image"
-            class="w-full h-64 object-cover rounded-lg mb-6">
-
-        <!-- Event Details Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <p class="text-gray-300"><strong>Description:</strong> {{ event.description }}</p>
-            <p class="text-gray-300"><strong>Date:</strong> {{ event.date }}</p>
-            <p class="text-gray-300"><strong>Time:</strong> {{ event.time }}</p>
-            <p class="text-gray-300"><strong>Location:</strong> {{ event.location }}</p>
-            <p class="text-gray-300"><strong>Category:</strong> {{ event.category }}</p>
-            <p class="text-gray-300"><strong>Price:</strong> ${{ event.ticket_price }}</p>
+        <!-- Error State -->
+        <div *ngIf="!isLoading && errorMessage && userType !== 'organizer'"
+            class="p-6 bg-red-600 text-white rounded-lg max-w-md mx-auto mt-8">
+            <p>{{ errorMessage }}</p>
         </div>
-
-        <!-- Promotional Video -->
-        <div *ngIf="event.promotional_video" class="mb-6">
-            <video controls class="w-full h-auto rounded-lg shadow">
-                <source [src]="event.promotional_video" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
-        </div>
-
-        <!-- Booking Section for Attendees -->
-        <div *ngIf="userType === 'attendee'" class="mb-6">
-            <h3 class="text-xl text-white mb-2">Select Ticket Type</h3>
-            <div *ngIf="event.tickets && event.tickets.length > 0" class="mb-4">
-                <select [(ngModel)]="selectedTicketId" class="w-full px-3 py-2 bg-gray-700 text-white rounded">
-                    <option value="" disabled>Select a ticket</option>
-                    <option *ngFor="let ticket of event.tickets" [value]="ticket.id">
-                        {{ ticket.ticket_type }} - ${{ ticket.price }} ({{ ticket.quantity - ticket.sold }} available)
-                    </option>
-                </select>
-            </div>
-            <button (click)="bookEvent()"
-                class="px-4 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 transition">
-                Book Event
-            </button>
-        </div>
-
-        <!-- Success and Error Messages -->
-        <div *ngIf="successMessage" class="mt-4 text-green-500">
-            {{ successMessage }}
-        </div>
-        <div *ngIf="errorMessage" class="mt-4 text-red-500">
-            {{ errorMessage }}
-        </div>
-
     </div>
-
-    <!-- Error State -->
-    <div *ngIf="!isLoading && errorMessage && userType !== 'organizer'"
-        class="p-6 bg-red-600 text-white rounded-lg max-w-md mx-auto mt-8">
-        <p>{{ errorMessage }}</p>
-    </div>
-
 </div>

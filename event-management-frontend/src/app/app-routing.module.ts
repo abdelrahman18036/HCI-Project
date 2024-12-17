@@ -13,6 +13,7 @@ import { TicketDetailComponent } from './components/tickets/ticket-detail/ticket
 import { RegistrationListComponent } from './components/registrations/registration-list/registration-list.component';
 import { FeedbackListComponent } from './components/feedback/feedback-list/feedback-list.component';
 import { ProfileComponent } from './components/profile/profile.component';
+import { EventEditComponent } from './components/events/event-edit/event-edit.component.ts';
 
 import { AuthGuard } from './guards/auth.guard';
 import { RoleGuard } from './guards/role.guard';
@@ -53,6 +54,13 @@ const routes: Routes = [
     path: 'events/:id',
     component: EventDetailComponent,
   },
+  {
+    path: 'events/:id/edit',
+    component: EventEditComponent,
+    canActivate: [AuthGuard],
+    data: { auth: true },
+  },
+
   { path: 'tickets', component: TicketListComponent },
   { path: 'tickets/:id', component: TicketDetailComponent },
   {

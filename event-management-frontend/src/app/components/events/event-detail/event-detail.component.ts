@@ -5,9 +5,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { EventService } from '../../../services/event.service';
 import { RegistrationService } from '../../../services/registration.service';
 import { AuthService } from '../../../services/auth.service';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 
 interface Ticket {
   id: number;
@@ -29,6 +30,7 @@ interface Event {
   promotional_image: string;
   promotional_video: string;
   tickets: Ticket[];
+  registrations_count: number; // Ensure this is included in the serializer
 }
 
 interface RegistrationCreateData {
@@ -39,7 +41,7 @@ interface RegistrationCreateData {
 @Component({
   selector: 'app-event-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule],
   templateUrl: './event-detail.component.html',
   styleUrls: ['./event-detail.component.css'],
 })
@@ -57,8 +59,7 @@ export class EventDetailComponent implements OnInit {
     private eventService: EventService,
     private registrationService: RegistrationService,
     private authService: AuthService,
-    private router: Router,
-    private fb: FormBuilder
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -101,6 +102,17 @@ export class EventDetailComponent implements OnInit {
       next: () => {
         this.successMessage = 'Event booked successfully.';
         this.errorMessage = '';
+        if (this.event) {
+          // Update sold count
+          const bookedTicket = this.event.tickets.find(
+            (t) => t.id === this.selectedTicketId
+          );
+          if (bookedTicket) {
+            bookedTicket.sold += 1;
+          }
+          // Update registrations count
+          this.event.registrations_count += 1;
+        }
       },
       error: (err: any) => {
         this.errorMessage = 'Failed to book event.';
@@ -124,5 +136,10 @@ export class EventDetailComponent implements OnInit {
         },
       });
     }
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
 }

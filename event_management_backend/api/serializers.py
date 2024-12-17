@@ -68,17 +68,20 @@ class TicketSerializer(serializers.ModelSerializer):
 # Event Serializer
 class EventSerializer(serializers.ModelSerializer):
     organizer = serializers.ReadOnlyField(source='organizer.username')
-    tickets_data = serializers.CharField(write_only=True)  # Renamed to avoid conflict
-    tickets = TicketSerializer(many=True, read_only=True)  # Read-only nested serializer
+    tickets_data = serializers.CharField(write_only=True)  # Write-only field for creating/updating tickets
+    tickets = TicketSerializer(many=True, read_only=True)  # Nested read-only serializer for tickets
     promotional_image = serializers.ImageField(required=False, allow_null=True)
     promotional_video = serializers.FileField(required=False, allow_null=True)
+    registrations_count = serializers.IntegerField(read_only=True)  # New read-only field
 
     class Meta:
         model = Event
         fields = '__all__'
 
     def validate_tickets_data(self, value):
-        # Attempt to parse 'tickets_data' as JSON
+        """
+        Validate that 'tickets_data' is a valid JSON list.
+        """
         try:
             parsed = json.loads(value)
             if not isinstance(parsed, list):

@@ -11,6 +11,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth import authenticate
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+from rest_framework.permissions import BasePermission
+from django.db.models import Count
 
 # User Registration (unchanged)
 class SignupView(generics.CreateAPIView):
@@ -105,21 +107,28 @@ class FeedbackListCreateView(generics.ListCreateAPIView):
         serializer.save(attendee=self.request.user)
 
 # Organizer-specific Views (unchanged)
+class IsOrganizerOrReadOnly(BasePermission):
+    """
+    Custom permission to only allow organizers to edit or delete their own events.
+    """
+
+    def has_object_permission(self, request, view, obj):
+        # Read permissions are allowed to any request,
+        # so we'll always allow GET, HEAD, or OPTIONS requests.
+        if request.method in permissions.SAFE_METHODS:
+            return True
+
+        # Write permissions are only allowed to the organizer of the event.
+        return obj.organizer == request.user
+
 class OrganizerEventListView(generics.ListAPIView):
     serializer_class = EventSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return Event.objects.filter(organizer=self.request.user)
-
-# Attendee-specific Views (unchanged)
-class AttendeeRegistrationListView(generics.ListAPIView):
-    serializer_class = RegistrationSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get_queryset(self):
-        return Registration.objects.filter(attendee=self.request.user)
-
+        return Event.objects.filter(organizer=self.request.user).annotate(
+            registrations_count=Count('registrations')
+        ).order_by('-is_promotion', '-created_at')
 # User Profile View (unchanged)
 class UserProfileView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = UserSerializer
@@ -136,3 +145,12 @@ class EventAttendeesListView(generics.ListAPIView):
     def get_queryset(self):
         event_id = self.kwargs['event_id']
         return User.objects.filter(registrations__event_id=event_id).distinct()
+
+
+
+class AttendeeRegistrationListView(generics.ListAPIView):
+    serializer_class = RegistrationSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Registration.objects.filter(attendee=self.request.user)

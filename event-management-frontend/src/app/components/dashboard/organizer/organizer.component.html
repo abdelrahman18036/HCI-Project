@@ -1,16 +1,18 @@
+<!-- src/app/components/organizer/organizer.component.html -->
+
 <div class="min-h-screen bg-gray-900 text-white">
     <nav class="flex justify-between items-center p-4 bg-gray-800">
         <h1 class="text-xl">Organizer Dashboard</h1>
         <div class="flex space-x-4">
-            <a routerLink="/events" class="text-gray-300 hover:text-white">Events</a>
+            <a routerLink="/events" class="text-gray-300 hover:text-white">My Events</a>
             <a routerLink="/profile" class="text-gray-300 hover:text-white">Profile</a>
             <button (click)="logout()" class="text-gray-300 hover:text-white">Logout</button>
         </div>
     </nav>
     <div class="p-4">
         <div class="flex justify-between mb-4">
-            <h2 class="text-3xl text-white">My Events</h2>
-            <a routerLink="/events/create" class="px-4 py-2 bg-green-600 text-white rounded">Create Event</a>
+            <h2 class="text-3xl text-white">All Events</h2>
+            <a routerLink="/events" class="px-4 py-2 bg-green-600 text-white rounded">Create Event</a>
         </div>
         <div *ngIf="isLoading" class="flex justify-center items-center">
             <p class="text-gray-300">Loading...</p>
@@ -66,8 +68,19 @@
                             View Details
                         </a>
                         <div class="text-gray-400">
-                            <span>{{ event.attendees.length }} Attendees</span>
+                            <span>{{ event.registrations_count }} Attendees</span>
                         </div>
+                    </div>
+                    <!-- Edit and Delete Buttons -->
+                    <div class="mt-4 flex space-x-2">
+                        <button (click)="editEvent(event.id)"
+                            class="px-4 py-2 bg-yellow-500 text-white rounded-lg shadow hover:bg-yellow-600 transition">
+                            Edit
+                        </button>
+                        <button (click)="deleteEvent(event.id)"
+                            class="px-4 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition">
+                            Delete
+                        </button>
                     </div>
                 </div>
             </div>

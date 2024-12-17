@@ -30,7 +30,7 @@ urlpatterns = [
 
     # Organizer-specific
     path('organizer/events/', OrganizerEventListView.as_view(), name='organizer-event-list'),
-
+    
     # Attendee-specific
     path('attendee/registrations/', AttendeeRegistrationListView.as_view(), name='attendee-registration-list'),
 
