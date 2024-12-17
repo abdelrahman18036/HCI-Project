@@ -39,5 +39,6 @@ urlpatterns = [
     path('events/<int:event_id>/attendees/', EventAttendeesListView.as_view(), name='event-attendees-list'),  # New route
     path('ticket-types/', TicketTypeListView.as_view(), name='ticket-type-list'),  # New endpoint
 
+    path('events/<int:event_id>/feedback/', FeedbackListCreateView.as_view(), name='event-feedback-list-create'),
 
 ]

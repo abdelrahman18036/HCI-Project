@@ -17,7 +17,6 @@ import { EventCreateComponent } from './components/events/event-create/event-cre
 import { TicketListComponent } from './components/tickets/ticket-list/ticket-list.component';
 import { TicketDetailComponent } from './components/tickets/ticket-detail/ticket-detail.component';
 import { RegistrationListComponent } from './components/registrations/registration-list/registration-list.component';
-import { FeedbackListComponent } from './components/feedback/feedback-list/feedback-list.component';
 import { ProfileComponent } from './components/profile/profile.component';
 
 // Other imports
@@ -31,16 +30,12 @@ import { AuthInterceptorService } from './services/auth-interceptor.service';
 import { AppComponent } from './app.component';
 
 @NgModule({
-  declarations: [
-    OrganizerComponent,
-
-    TicketDetailComponent,
-    RegistrationListComponent,
-  ],
+  declarations: [TicketDetailComponent, RegistrationListComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
     CommonModule,
+    OrganizerComponent,
     HttpClientModule,
     ReactiveFormsModule,
     FormsModule,
@@ -49,7 +44,6 @@ import { AppComponent } from './app.component';
     EventDetailComponent,
     EventCreateComponent,
     TicketListComponent,
-    FeedbackListComponent,
     ProfileComponent,
     LoginComponent,
     SignupComponent,
@@ -67,6 +61,5 @@ import { AppComponent } from './app.component';
       multi: true,
     },
   ],
-  bootstrap: [AppComponent],
 })
 export class AppModule {}

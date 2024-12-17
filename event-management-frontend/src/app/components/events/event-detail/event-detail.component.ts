@@ -9,6 +9,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { EventFeedbackComponent } from '../event-feedback/event-feedback.component';
 
 interface Ticket {
   id: number;
@@ -49,7 +50,13 @@ interface Profile {
 @Component({
   selector: 'app-event-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    RouterModule,
+    EventFeedbackComponent,
+  ],
   templateUrl: './event-detail.component.html',
   styleUrls: ['./event-detail.component.css'],
 })

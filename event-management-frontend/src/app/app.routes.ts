@@ -12,7 +12,6 @@ import { TicketListComponent } from './components/tickets/ticket-list/ticket-lis
 import { TicketDetailComponent } from './components/tickets/ticket-detail/ticket-detail.component';
 import { RegistrationListComponent } from './components/registrations/registration-list/registration-list.component';
 import { EventEditComponent } from './components/events/event-edit/event-edit.component';
-import { FeedbackListComponent } from './components/feedback/feedback-list/feedback-list.component';
 import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -44,7 +43,6 @@ export const routes: Routes = [
     component: RegistrationListComponent,
     canActivate: [AuthGuard],
   },
-  { path: 'feedback', component: FeedbackListComponent },
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
   { path: '**', redirectTo: '/login' },
 ];

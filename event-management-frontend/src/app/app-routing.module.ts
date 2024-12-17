@@ -11,9 +11,8 @@ import { EventCreateComponent } from './components/events/event-create/event-cre
 import { TicketListComponent } from './components/tickets/ticket-list/ticket-list.component';
 import { TicketDetailComponent } from './components/tickets/ticket-detail/ticket-detail.component';
 import { RegistrationListComponent } from './components/registrations/registration-list/registration-list.component';
-import { FeedbackListComponent } from './components/feedback/feedback-list/feedback-list.component';
 import { ProfileComponent } from './components/profile/profile.component';
-import { EventEditComponent } from './components/events/event-edit/event-edit.component.ts';
+import { EventEditComponent } from './components/events/event-edit/event-edit.component';
 
 import { AuthGuard } from './guards/auth.guard';
 import { RoleGuard } from './guards/role.guard';
@@ -69,7 +68,6 @@ const routes: Routes = [
     canActivate: [AuthGuard, RoleGuard],
     data: { expectedRole: 'attendee' },
   },
-  { path: 'feedback', component: FeedbackListComponent },
   {
     path: 'profile',
     component: ProfileComponent,

@@ -150,7 +150,15 @@ class EventAttendeesListView(generics.ListAPIView):
         event_id = self.kwargs['event_id']
         return User.objects.filter(registrations__event_id=event_id).distinct()
 
+class FeedbackListCreateView(generics.ListCreateAPIView):
+    serializer_class = FeedbackSerializer
 
+    def get_queryset(self):
+        event_id = self.kwargs.get('event_id')
+        return Feedback.objects.filter(event_id=event_id).order_by('-created_at')
+
+    def perform_create(self, serializer):
+        serializer.save(attendee=self.request.user)
 
 class AttendeeRegistrationListView(generics.ListAPIView):
     serializer_class = RegistrationSerializer

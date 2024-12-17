@@ -169,3 +169,20 @@ class RegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Registration
         fields = ['id', 'event', 'event_details', 'ticket', 'ticket_id', 'attendee', 'registered_at']
+
+
+class FeedbackSerializer(serializers.ModelSerializer):
+    attendee = AttendeeSerializer(read_only=True)
+    event = serializers.PrimaryKeyRelatedField(queryset=Event.objects.all(), write_only=True)
+
+    class Meta:
+        model = Feedback
+        fields = ['id', 'event', 'attendee', 'comment', 'rating', 'created_at']
+        read_only_fields = ['id', 'attendee', 'created_at']
+
+    def create(self, validated_data):
+        # Remove 'attendee=user' here, as it's already part of validated_data
+        user = self.context['request'].user
+        # Assuming that the `validated_data` will have the 'event' and 'attendee' is filled correctly
+        validated_data['attendee'] = user
+        return Feedback.objects.create(**validated_data)

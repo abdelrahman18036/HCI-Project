@@ -9,7 +9,7 @@
             <button (click)="logout()" class="text-gray-300 hover:text-white">Logout</button>
         </div>
     </nav>
-    <div class="p-4  flex justify-center">
+    <div class="p-4 flex justify-center">
         <!-- Loading State -->
         <div *ngIf="isLoading" class="flex justify-center items-center h-full">
             <p class="text-gray-300">Loading...</p>
@@ -88,7 +88,7 @@
                 {{ errorMessage }}
             </div>
         </div>
-
-
     </div>
+    <!-- Integrate Feedback Component -->
+    <app-event-feedback *ngIf="event" [eventId]="event.id"></app-event-feedback>
 </div>
