@@ -61,11 +61,12 @@ class TicketTypeSerializer(serializers.ModelSerializer):
 # your_app/serializers.py
 
 class TicketSerializer(serializers.ModelSerializer):
-    ticket_type = serializers.CharField(source='ticket_type.name', read_only=True)  # Added name
-
+    ticket_type_id = serializers.PrimaryKeyRelatedField(queryset=TicketType.objects.all(), source='ticket_type', write_only=True)
+    name = serializers.CharField(source='ticket_type.name', read_only=True)
     class Meta:
         model = Ticket
-        fields = ['id', 'ticket_type', 'price', 'quantity', 'sold']
+        fields = ['id', 'ticket_type_id', 'price', 'quantity', 'sold', 'name']
+
 
 # Event Serializer
 class EventSerializer(serializers.ModelSerializer):
@@ -88,6 +89,12 @@ class EventSerializer(serializers.ModelSerializer):
             parsed = json.loads(value)
             if not isinstance(parsed, list):
                 raise serializers.ValidationError("Tickets must be a list.")
+            
+            # Check if each ticket contains 'ticket_type_id'
+            for ticket in parsed:
+                if 'ticket_type_id' not in ticket:
+                    raise serializers.ValidationError("Each ticket must have a 'ticket_type_id'.")
+                
             return parsed
         except json.JSONDecodeError:
             raise serializers.ValidationError("Invalid JSON format for 'tickets_data'.")
@@ -98,12 +105,16 @@ class EventSerializer(serializers.ModelSerializer):
         event = Event.objects.create(**validated_data)
 
         for ticket_dict in tickets_data:
-            # Validate each ticket with the TicketSerializer
+            # Ensure that ticket_dict contains 'ticket_type_id'
+            if 'ticket_type_id' not in ticket_dict:
+                raise serializers.ValidationError("Ticket type is required for each ticket.")
+            
             ticket_serializer = TicketSerializer(data=ticket_dict)
             ticket_serializer.is_valid(raise_exception=True)
             Ticket.objects.create(event=event, **ticket_serializer.validated_data)
 
         return event
+
 
     def update(self, instance, validated_data):
         tickets_data = validated_data.pop('tickets_data', None)
@@ -137,9 +148,24 @@ class AttendeeSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'username', 'email']
 
+
+class EventDetailsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Event
+        fields = ['id', 'title', 'date', 'time', 'location', 'category', 'ticket_price', 'promotional_image', 'promotional_video']
+
+
+
+
+
 # Registration Serializer (unchanged)
 class RegistrationSerializer(serializers.ModelSerializer):
+    ticket = TicketSerializer(read_only=True)
+    attendee = AttendeeSerializer(read_only=True)
+    event_details = EventDetailsSerializer(source='event', read_only=True)
+    event = serializers.PrimaryKeyRelatedField(write_only=True, queryset=Event.objects.all())
+    ticket_id = serializers.PrimaryKeyRelatedField(write_only=True, queryset=Ticket.objects.all(), source='ticket')
+
     class Meta:
         model = Registration
-        fields = ['id', 'event', 'ticket', 'attendee']  # Added 'ticket'
-        read_only_fields = ['attendee']
+        fields = ['id', 'event', 'event_details', 'ticket', 'ticket_id', 'attendee', 'registered_at']

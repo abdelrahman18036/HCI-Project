@@ -73,7 +73,7 @@ export class EventCreateComponent implements OnInit {
 
   private createTicketGroup(): FormGroup {
     return this.fb.group({
-      ticket_type: [null, Validators.required], // Changed to null for select
+      ticket_type_id: [null, Validators.required], // Must be set to a valid TicketType ID
       price: [0, [Validators.required, Validators.min(0)]],
       quantity: [0, [Validators.required, Validators.min(1)]],
     });
@@ -117,7 +117,7 @@ export class EventCreateComponent implements OnInit {
         event.tickets.forEach((ticket: any) => {
           this.tickets.push(
             this.fb.group({
-              ticket_type: ticket.ticket_type, // Assuming it's the TicketType ID
+              ticket_type_id: ticket.ticket_type_id, // Ensure backend sends 'ticket_type_id'
               price: [ticket.price, [Validators.required, Validators.min(0)]],
               quantity: [
                 ticket.quantity,
@@ -160,6 +160,8 @@ export class EventCreateComponent implements OnInit {
   }
 
   onSubmit(): void {
+    console.log('Submitting Form:', this.eventForm.value);
+
     if (this.eventForm.invalid) {
       this.errorMessage = 'Please fill out all required fields correctly.';
       return;
@@ -167,6 +169,7 @@ export class EventCreateComponent implements OnInit {
 
     this.isLoading = true;
     const eventData = this.eventForm.value;
+    console.log('Form Valid:', this.eventForm.valid);
 
     // Create FormData
     const formData = new FormData();
@@ -190,10 +193,17 @@ export class EventCreateComponent implements OnInit {
       formData.append('promotional_video', this.selectedPromotionalVideo);
     }
 
-    // Append tickets as JSON string
-    formData.append('tickets_data', JSON.stringify(eventData.tickets));
+    // Prepare tickets_data
+    const ticketsData = eventData.tickets.map((ticket: any) => ({
+      ticket_type_id: ticket.ticket_type_id,
+      price: ticket.price,
+      quantity: ticket.quantity,
+    }));
 
-    console.log('Submitting Tickets:', eventData.tickets);
+    // Append tickets as JSON string
+    formData.append('tickets_data', JSON.stringify(ticketsData));
+
+    console.log('Submitting Tickets:', ticketsData);
 
     if (this.isEditing) {
       this.eventService.updateEvent(this.eventId, formData).subscribe({

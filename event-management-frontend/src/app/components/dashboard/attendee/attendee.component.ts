@@ -3,36 +3,15 @@
 import { Component, OnInit } from '@angular/core';
 import { RegistrationService } from '../../../services/registration.service';
 import { AuthService } from '../../../services/auth.service';
-import { RouterModule, RouterOutlet, Router } from '@angular/router';
+import { Router } from '@angular/router';
+import { Registration } from '../../../models/registration.model';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-
-interface Event {
-  id: number;
-  title: string;
-  date: string;
-  time: string;
-  location: string;
-  // Add other relevant fields
-}
-
-interface Ticket {
-  id: number;
-  ticket_type: string;
-  // Add other relevant fields
-}
-
-interface Registration {
-  attendee: number;
-  event: Event;
-  ticket: Ticket;
-  registered_at: string;
-}
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-attendee',
   standalone: true,
-  imports: [RouterOutlet, RouterModule, CommonModule, FormsModule],
+  imports: [RouterModule, CommonModule],
   templateUrl: './attendee.component.html',
   styleUrls: ['./attendee.component.css'],
 })
@@ -55,10 +34,12 @@ export class AttendeeComponent implements OnInit {
     this.isLoading = true;
     this.registrationService.getAttendeeRegistrations().subscribe({
       next: (data: Registration[]) => {
-        this.registrations = data;
+        console.log('Registrations fetched:', data);
+        this.registrations = data.filter((reg) => reg.event_details);
         this.isLoading = false;
       },
       error: (err: any) => {
+        console.error('Error fetching registrations:', err);
         this.errorMessage = 'Failed to load your registrations.';
         this.isLoading = false;
       },
@@ -68,5 +49,23 @@ export class AttendeeComponent implements OnInit {
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);
+  }
+
+  shareRegistration(registration: Registration): void {
+    if (navigator.share) {
+      navigator
+        .share({
+          title: registration.event_details?.title,
+          text: `Join me at ${registration.event_details?.title} on ${registration.event_details?.date}!`,
+          url:
+            window.location.origin +
+            `/events/${registration.event_details?.id}`,
+        })
+        .then(() => console.log('Successful share'))
+        .catch((error) => console.log('Error sharing', error));
+    } else {
+      // Fallback for browsers that do not support the Web Share API
+      alert('Sharing is not supported in your browser.');
+    }
   }
 }

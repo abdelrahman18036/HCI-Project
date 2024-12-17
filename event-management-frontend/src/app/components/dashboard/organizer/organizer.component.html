@@ -4,15 +4,15 @@
     <nav class="flex justify-between items-center p-4 bg-gray-800">
         <h1 class="text-xl">Organizer Dashboard</h1>
         <div class="flex space-x-4">
-            <a routerLink="/events" class="text-gray-300 hover:text-white">ALL Events</a>
+            <a routerLink="/events" class="text-gray-300 hover:text-white">all Events</a>
             <a routerLink="/profile" class="text-gray-300 hover:text-white">Profile</a>
             <button (click)="logout()" class="text-gray-300 hover:text-white">Logout</button>
         </div>
     </nav>
     <div class="p-4">
         <div class="flex justify-between mb-4">
-            <h2 class="text-3xl text-white">All Events</h2>
-            <a routerLink="/events" class="px-4 py-2 bg-green-600 text-white rounded">Create Event</a>
+            <h2 class="text-3xl text-white">My Events</h2>
+            <a routerLink="/events/create" class="px-4 py-2 bg-green-600 text-white rounded">Create Event</a>
         </div>
         <div *ngIf="isLoading" class="flex justify-center items-center">
             <p class="text-gray-300">Loading...</p>

@@ -1,34 +1,126 @@
 <!-- src/app/components/dashboard/attendee/attendee.component.html -->
 
 <div class="min-h-screen bg-gray-900 text-white">
-    <nav class="flex justify-between items-center p-4 bg-gray-800">
-        <h1 class="text-xl">Attendee Dashboard</h1>
-        <div class="flex space-x-4">
-            <a routerLink="/events" class="text-gray-300 hover:text-white">Events</a>
-            <a routerLink="/profile" class="text-gray-300 hover:text-white">Profile</a>
-            <button (click)="logout()" class="text-gray-300 hover:text-white">Logout</button>
+    <!-- Navigation Bar -->
+    <nav class="flex justify-between items-center p-4 bg-gray-800 shadow-md">
+        <h1 class="text-2xl font-bold">Attendee Dashboard</h1>
+        <div class="flex space-x-6">
+            <a routerLink="/events" class="text-gray-300 hover:text-white transition-colors">Events</a>
+            <a routerLink="/profile" class="text-gray-300 hover:text-white transition-colors">Profile</a>
+            <button (click)="logout()" class="text-gray-300 hover:text-white transition-colors">Logout</button>
         </div>
     </nav>
-    <div class="p-4">
-        <div class="flex justify-between mb-4">
-            <h2 class="text-3xl text-white">My Registrations</h2>
+
+    <!-- Main Content -->
+    <div class="p-6">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-3xl font-semibold">My Registrations</h2>
+            <!-- Optional: Add a button to add new registrations or other actions -->
+            <!-- <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Add Registration</button> -->
         </div>
+
+        <!-- Loading Indicator -->
         <div *ngIf="isLoading" class="flex justify-center items-center">
             <p class="text-gray-300">Loading...</p>
         </div>
+
+        <!-- Error Message -->
         <div *ngIf="errorMessage" class="mb-4 text-red-500">
             {{ errorMessage }}
         </div>
+
+        <!-- No Registrations Message -->
+        <div *ngIf="!isLoading && registrations.length === 0" class="mb-4 text-gray-300">
+            You have no registrations.
+        </div>
+
+        <!-- Registrations Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div *ngFor="let registration of registrations" class="p-4 bg-gray-800 rounded">
-                <h3 class="text-xl">{{ registration.event.title }}</h3>
-                <p>Date: {{ registration.event.date }}</p>
-                <p>Time: {{ registration.event.time }}</p>
-                <p>Location: {{ registration.event.location }}</p>
-                <p>Ticket Type: {{ registration.ticket.ticket_type }}</p>
-                <a [routerLink]="['/events', registration.event.id]" class="text-blue-500 hover:underline">
-                    View Event
-                </a>
+            <div *ngFor="let registration of registrations"
+                class="bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300">
+                <!-- Event Image -->
+                <img [src]="registration.event_details?.promotional_image"
+                    alt="{{ registration.event_details?.title }} Image" class="w-full h-48 object-cover"
+                    loading="lazy" />
+
+                <!-- Card Content -->
+                <div class="p-6">
+                    <!-- Event Title -->
+                    <h3 class="text-xl font-bold mb-2">{{ registration.event_details?.title }}</h3>
+
+                    <!-- Category Badge -->
+                    <span class="inline-block bg-blue-600 text-white text-xs px-2 py-1 rounded-full mb-4">
+                        {{ registration.event_details?.category }}
+                    </span>
+
+                    <!-- Event Details -->
+                    <ul class="mb-4">
+                        <li class="flex items-center text-gray-400 mb-2">
+                            <!-- Date Icon -->
+                            <svg class="w-5 h-5 mr-2 text-blue-400" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                </path>
+                            </svg>
+                            {{ registration.event_details?.date }}
+                        </li>
+                        <li class="flex items-center text-gray-400 mb-2">
+                            <!-- Time Icon -->
+                            <svg class="w-5 h-5 mr-2 text-blue-400" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            {{ registration.event_details?.time }}
+                        </li>
+                        <li class="flex items-center text-gray-400">
+                            <!-- Location Icon -->
+                            <svg class="w-5 h-5 mr-2 text-blue-400" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17.657 16.657L13.414 12.414a2 2 0 00-2.828 0L6.343 16.657a8 8 0 1011.314 0z">
+                                </path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            {{ registration.event_details?.location }}
+                        </li>
+                    </ul>
+
+                    <!-- Ticket Information -->
+                    <div class="mb-4">
+                        <p class="text-gray-400 gap-2 ">
+                            <strong>Ticket Type:</strong>
+                            <span class="bg-green-600 text-white text-xs px-1 py-1 rounded-full ml-2">
+                                {{ registration.ticket.name }}
+                            </span>
+                        </p>
+                        <p class="text-gray-400">
+                            <strong>Price:</strong> ${{ registration.ticket.price }}
+                        </p>
+                    </div>
+
+                    <!-- Registration Date -->
+                    <p class="text-gray-400 mb-4">
+                        <strong>Registered At:</strong> {{ registration.registered_at}}
+                    </p>
+
+                    <!-- Action Buttons -->
+                    <div class="flex justify-between items-center">
+                        <a [routerLink]="['/events', registration.event_details?.id]"
+                            class="text-blue-500 hover:text-blue-400 font-semibold">
+                            View Event
+                        </a>
+                        <button class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded transition-colors"
+                            (click)="shareRegistration(registration)">
+                            Share
+                        </button>
+                    </div>
+                </div>
+
+
             </div>
         </div>
     </div>

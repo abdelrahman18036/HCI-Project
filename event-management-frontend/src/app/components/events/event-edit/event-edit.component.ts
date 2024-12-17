@@ -7,11 +7,11 @@ import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../../services/auth.service';
-
+import { RouterModule } from '@angular/router';
 @Component({
   selector: 'app-event-edit',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule],
   templateUrl: './event-edit.component.html',
   styleUrls: ['./event-edit.component.css'],
 })
@@ -68,7 +68,7 @@ export class EventEditComponent implements OnInit {
 
   createTicketGroup(): FormGroup {
     return this.fb.group({
-      ticket_type: [null, Validators.required],
+      ticket_type_id: [null, Validators.required], // Ensure this is ticket_type_id
       price: [0, [Validators.required, Validators.min(0)]],
       quantity: [0, [Validators.required, Validators.min(1)]],
     });
@@ -108,7 +108,7 @@ export class EventEditComponent implements OnInit {
         event.tickets.forEach((ticket: any) => {
           this.tickets.push(
             this.fb.group({
-              ticket_type: ticket.ticket_type, // TicketType ID
+              ticket_type_id: ticket.ticket_type_id, // Ensure ticket_type_id is used here
               price: [ticket.price, [Validators.required, Validators.min(0)]],
               quantity: [
                 ticket.quantity,
@@ -183,7 +183,7 @@ export class EventEditComponent implements OnInit {
 
     // Prepare tickets_data
     const ticketsData = eventData.tickets.map((ticket: any) => ({
-      ticket_type: ticket.ticket_type,
+      ticket_type_id: ticket.ticket_type_id, // This is now ticket_type_id, not the full object
       price: ticket.price,
       quantity: ticket.quantity,
     }));

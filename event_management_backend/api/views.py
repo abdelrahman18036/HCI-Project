@@ -46,7 +46,7 @@ class TicketTypeListView(generics.ListAPIView):
 
 # Event List and Create (unchanged except parser_classes)
 class EventListCreateView(generics.ListCreateAPIView):
-    # queryset = Event.objects.all().order_by('-is_promotion', '-created_at')
+    queryset = Event.objects.all().order_by('-is_promotion', '-created_at')
     serializer_class = EventSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     parser_classes = [MultiPartParser, FormParser, JSONParser]  # Updated to include JSONParser
@@ -54,10 +54,7 @@ class EventListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(organizer=self.request.user)
 
-    def get_queryset(self):
-        return Event.objects.filter(organizer=self.request.user).annotate(
-            registrations_count=Count('registrations')
-        ).order_by('-is_promotion', '-created_at')
+    
 
 # Event Retrieve, Update, Destroy (unchanged except parser_classes)
 class EventRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):

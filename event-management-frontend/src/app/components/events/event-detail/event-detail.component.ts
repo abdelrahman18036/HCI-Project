@@ -13,6 +13,7 @@ import { RouterModule } from '@angular/router';
 interface Ticket {
   id: number;
   ticket_type: string;
+  name: string;
   price: number;
   quantity: number;
   sold: number;
@@ -36,7 +37,7 @@ interface Event {
 
 interface RegistrationCreateData {
   event: number;
-  ticket: number;
+  ticket_id: number; // Updated field name
 }
 
 interface Profile {
@@ -101,7 +102,6 @@ export class EventDetailComponent implements OnInit {
       },
     });
   }
-
   bookEvent(): void {
     if (!this.userType || this.userType !== 'attendee') {
       this.errorMessage = 'Only attendees can book events.';
@@ -115,7 +115,7 @@ export class EventDetailComponent implements OnInit {
 
     const registrationData: RegistrationCreateData = {
       event: this.eventId,
-      ticket: this.selectedTicketId,
+      ticket_id: this.selectedTicketId, // Updated field name
     };
 
     this.registrationService.createRegistration(registrationData).subscribe({
