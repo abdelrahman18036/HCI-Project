@@ -207,3 +207,24 @@ class CommentSerializer(serializers.ModelSerializer):
         # 'event' will be set in the view
         return Comment.objects.create(**validated_data)
 
+
+class TicketSalesSerializer(serializers.Serializer):
+    ticket_type = serializers.CharField()
+    sold = serializers.IntegerField()
+
+class EventAnalyticsSerializer(serializers.Serializer):
+    event_id = serializers.IntegerField()
+    title = serializers.CharField()
+    total_registrations = serializers.IntegerField()
+    total_feedback = serializers.IntegerField()
+    average_rating = serializers.FloatField()
+    ticket_sales = TicketSalesSerializer(many=True)
+    revenue = serializers.DecimalField(max_digits=10, decimal_places=2)
+
+class OrganizerAnalyticsSerializer(serializers.Serializer):
+    total_events = serializers.IntegerField()
+    total_registrations = serializers.IntegerField()
+    total_feedback = serializers.IntegerField()
+    average_rating = serializers.FloatField()
+    total_revenue = serializers.DecimalField(max_digits=15, decimal_places=2)
+    events = EventAnalyticsSerializer(many=True)

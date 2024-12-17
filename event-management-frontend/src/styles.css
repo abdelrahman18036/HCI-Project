@@ -1,7 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import url("https://fonts.googleapis.com/css2?family=Anton&family=Playwrite+NL+Guides&display=swap");
 
 body {
   @apply bg-gray-900 text-white;
+}
+* {
+  font-family: "Playwrite NL Guides", cursive !important;
 }

@@ -3,7 +3,7 @@
 from rest_framework import generics, permissions, status
 from .models import User, Event, Ticket, TicketType, Registration, Feedback, Comment
 from .serializers import (
-    AttendeeSerializer, CommentSerializer, UserSerializer, EventSerializer, 
+    AttendeeSerializer, CommentSerializer, OrganizerAnalyticsSerializer, UserSerializer, EventSerializer, 
     TicketSerializer, TicketTypeSerializer, RegistrationSerializer, FeedbackSerializer
 )
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -12,7 +12,7 @@ from rest_framework.views import APIView
 from django.contrib.auth import authenticate
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.permissions import BasePermission
-from django.db.models import Count
+from django.db.models import Count, Avg, Sum
 
 # User Registration (unchanged)
 class SignupView(generics.CreateAPIView):
@@ -178,3 +178,61 @@ class CommentListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         event_id = self.kwargs.get('event_id')
         serializer.save(attendee=self.request.user, event_id=event_id)
+
+class OrganizerAnalyticsView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        if user.user_type != 'organizer':
+            return Response({"error": "Only organizers can access analytics."}, status=403)
+        
+        events = Event.objects.filter(organizer=user)
+        total_events = events.count()
+        total_registrations = Registration.objects.filter(event__organizer=user).count()
+        total_feedback = Feedback.objects.filter(event__organizer=user).count()
+        average_rating = Feedback.objects.filter(event__organizer=user).aggregate(Avg('rating'))['rating__avg'] or 0
+        total_revenue = Registration.objects.filter(event__organizer=user).aggregate(
+            revenue=Sum('ticket__price')
+        )['revenue'] or 0.00
+
+        # Detailed analytics per event
+        events_data = []
+        for event in events:
+            registrations = Registration.objects.filter(event=event).count()
+            feedback_count = Feedback.objects.filter(event=event).count()
+            avg_rating = Feedback.objects.filter(event=event).aggregate(Avg('rating'))['rating__avg'] or 0
+            revenue = Registration.objects.filter(event=event).aggregate(
+                revenue=Sum('ticket__price')
+            )['revenue'] or 0.00
+
+            # Ticket sales breakdown
+            tickets = Ticket.objects.filter(event=event).select_related('ticket_type')
+            ticket_sales = []
+            for ticket in tickets:
+                ticket_sales.append({
+                    'ticket_type': ticket.ticket_type.name,
+                    'sold': ticket.sold
+                })
+
+            events_data.append({
+                'event_id': event.id,
+                'title': event.title,
+                'total_registrations': registrations,
+                'total_feedback': feedback_count,
+                'average_rating': avg_rating,
+                'ticket_sales': ticket_sales,
+                'revenue': revenue
+            })
+
+        analytics = {
+            'total_events': total_events,
+            'total_registrations': total_registrations,
+            'total_feedback': total_feedback,
+            'average_rating': average_rating,
+            'total_revenue': total_revenue,
+            'events': events_data
+        }
+
+        serializer = OrganizerAnalyticsSerializer(analytics)
+        return Response(serializer.data, status=200)

@@ -13,6 +13,7 @@ import { TicketDetailComponent } from './components/tickets/ticket-detail/ticket
 import { RegistrationListComponent } from './components/registrations/registration-list/registration-list.component';
 import { EventEditComponent } from './components/events/event-edit/event-edit.component';
 import { AuthGuard } from './guards/auth.guard';
+import { OrganizerAnalyticsComponent } from './components/organizer-analytics/organizer-analytics.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -42,6 +43,11 @@ export const routes: Routes = [
     path: 'registrations',
     component: RegistrationListComponent,
     canActivate: [AuthGuard],
+  },
+  {
+    path: 'organizer/analytics',
+    component: OrganizerAnalyticsComponent,
+    canActivate: [AuthGuard], // Protect the route
   },
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
   { path: '**', redirectTo: '/login' },

@@ -4,7 +4,11 @@
     <nav class="flex justify-between items-center p-4 bg-gray-800">
         <h1 class="text-xl">Organizer Dashboard</h1>
         <div class="flex space-x-4">
-            <a routerLink="/events" class="text-gray-300 hover:text-white">all Events</a>
+            <a routerLink="organizer/analytics" class="text-gray-300 hover:text-white"> Organizer Analytics
+            </a>
+
+            <a routerLink="/organizer" class="text-gray-300 hover:text-white"> My Events</a>
+            <a routerLink="/events" class="text-gray-300 hover:text-white">All Events</a>
             <a routerLink="/profile" class="text-gray-300 hover:text-white">Profile</a>
             <button (click)="logout()" class="text-gray-300 hover:text-white">Logout</button>
         </div>

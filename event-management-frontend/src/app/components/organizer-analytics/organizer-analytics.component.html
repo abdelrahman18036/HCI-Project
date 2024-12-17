@@ -1,0 +1,76 @@
+<div class="min-h-screen bg-gray-900 text-white">
+    <nav class="flex justify-between items-center p-4 bg-gray-800">
+        <h1 class="text-xl">Organizer Analytics</h1>
+        <div class="flex space-x-4">
+            <a routerLink="/organizer" class="text-gray-300 hover:text-white"> My Events</a>
+            <a routerLink="/events" class="text-gray-300 hover:text-white">Events</a>
+            <a routerLink="/profile" class="text-gray-300 hover:text-white">Profile</a>
+            <button (click)="logout()" class="text-gray-300 hover:text-white">Logout</button>
+        </div>
+    </nav>
+    <div class="p-6 bg-gray-900 text-white rounded-lg shadow-lg max-w-6xl mx-auto mt-8">
+        <h2 class="text-3xl font-semibold text-center text-white mb-6">Organizer Analytics</h2>
+
+        <!-- Loading Indicator -->
+        <div *ngIf="isLoading" class="text-center py-4">
+            <span class="text-gray-400">Loading...</span>
+        </div>
+
+        <!-- Error Message -->
+        <div *ngIf="errorMessage" class="text-red-500 text-center mb-4">
+            {{ errorMessage }}
+        </div>
+
+        <!-- Analytics Data -->
+        <div *ngIf="!isLoading && analytics" class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            <!-- Left Side: Key Data -->
+            <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+                <p class="text-xl text-gray-300 mb-4"><strong>Total Events:</strong> {{ analytics.total_events }}</p>
+                <p class="text-xl text-gray-300 mb-4"><strong>Total Registrations:</strong> {{
+                    analytics.total_registrations
+                    }}</p>
+                <p class="text-xl text-gray-300 mb-4"><strong>Total Feedback:</strong> {{ analytics.total_feedback }}
+                </p>
+                <p class="text-xl text-gray-300 mb-4"><strong>Average Rating:</strong> {{ analytics.average_rating }}
+                </p>
+                <p class="text-xl text-gray-300 mb-4"><strong>Total Revenue:</strong> ${{ analytics.total_revenue }}</p>
+            </div>
+
+            <!-- Right Side: Pie Chart -->
+            <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+                <p class="text-xl text-gray-300 mb-4"><strong>Events Breakdown:</strong></p>
+                <div class="h-64">
+                    <p-chart type="pie" [data]="pieData" [options]="pieOptions"></p-chart>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed Events Table -->
+        <div>
+            <h3 class="text-2xl font-semibold text-center text-white mb-6">Events Details</h3>
+            <p-table [value]="analytics.events" [paginator]="true" [rows]="10" responsiveLayout="scroll"
+                class="bg-gray-800 rounded-lg shadow-lg">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th class="text-gray-300">Event ID</th>
+                        <th class="text-gray-300">Title</th>
+                        <th class="text-gray-300">Total Registrations</th>
+                        <th class="text-gray-300">Total Feedback</th>
+                        <th class="text-gray-300">Average Rating</th>
+                        <th class="text-gray-300">Revenue</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-event>
+                    <tr>
+                        <td class="text-gray-300">{{ event.event_id }}</td>
+                        <td class="text-gray-300">{{ event.title }}</td>
+                        <td class="text-gray-300">{{ event.total_registrations }}</td>
+                        <td class="text-gray-300">{{ event.total_feedback }}</td>
+                        <td class="text-gray-300">{{ event.average_rating }}</td>
+                        <td class="text-gray-300">${{ event.revenue }}</td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+</div>

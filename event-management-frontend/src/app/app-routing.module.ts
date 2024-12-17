@@ -17,6 +17,7 @@ import { EventEditComponent } from './components/events/event-edit/event-edit.co
 import { AuthGuard } from './guards/auth.guard';
 import { RoleGuard } from './guards/role.guard';
 import { RedirectIfLoggedInGuard } from './guards/redirect-if-logged-in.guard';
+import { OrganizerAnalyticsComponent } from './components/organizer-analytics/organizer-analytics.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -72,6 +73,12 @@ const routes: Routes = [
     path: 'profile',
     component: ProfileComponent,
     canActivate: [AuthGuard],
+  },
+  {
+    path: 'organizer/analytics',
+    component: OrganizerAnalyticsComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { expectedRole: 'organizer' },
   },
   { path: '**', redirectTo: '/login' },
 ];
