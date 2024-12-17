@@ -31,11 +31,18 @@ interface Event {
   promotional_video: string;
   tickets: Ticket[];
   registrations_count: number; // Ensure this is included in the serializer
+  organizer: string;
 }
 
 interface RegistrationCreateData {
   event: number;
   ticket: number;
+}
+
+interface Profile {
+  username: string;
+  user_type: string;
+  // ... other fields ...
 }
 
 @Component({
@@ -49,6 +56,7 @@ export class EventDetailComponent implements OnInit {
   event: Event | null = null;
   eventId!: number;
   userType: string | null = null;
+  currentUsername: string | null = null;
   selectedTicketId: number | null = null;
   isLoading: boolean = false;
   successMessage: string = '';
@@ -65,7 +73,19 @@ export class EventDetailComponent implements OnInit {
   ngOnInit(): void {
     this.eventId = Number(this.route.snapshot.paramMap.get('id'));
     this.userType = this.authService.getUserType();
+    this.loadProfile();
     this.loadEvent();
+  }
+
+  loadProfile(): void {
+    this.authService.getProfile().subscribe({
+      next: (profile: Profile) => {
+        this.currentUsername = profile.username;
+      },
+      error: (err: any) => {
+        // handle error
+      },
+    });
   }
 
   loadEvent(): void {

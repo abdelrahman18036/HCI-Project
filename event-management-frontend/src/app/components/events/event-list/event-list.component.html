@@ -4,7 +4,10 @@
     <nav class="flex justify-between items-center p-4 bg-gray-800 mb-4">
         <h2 class="text-3xl text-white">All Events</h2>
         <div class="flex space-x-4">
-            <a routerLink="/organizer" class="text-gray-300 hover:text-white">My Events</a>
+            <a *ngIf="userType === 'organizer'" routerLink="/organizer/" class="text-gray-300 hover:text-white">My
+                Events</a>
+            <a *ngIf="userType === 'attendee'" routerLink="/attendee/" class="text-gray-300 hover:text-white">My
+                Registrations</a>
             <a routerLink="/events" class="text-gray-300 hover:text-white">Events</a>
             <a routerLink="/profile" class="text-gray-300 hover:text-white">Profile</a>
             <button (click)="logout()" class="text-gray-300 hover:text-white">Logout</button>

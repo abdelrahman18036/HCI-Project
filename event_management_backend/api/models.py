@@ -54,9 +54,9 @@ class Ticket(models.Model):
 
 # Registration Model
 class Registration(models.Model):
-    attendee = models.ForeignKey(User, on_delete=models.CASCADE, related_name='registrations')
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='registrations')
-    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE)
+    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name='registrations')  # Added 'ticket' field
+    attendee = models.ForeignKey(User, on_delete=models.CASCADE, related_name='registrations')
     registered_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

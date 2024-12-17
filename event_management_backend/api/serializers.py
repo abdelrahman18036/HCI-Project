@@ -58,12 +58,14 @@ class TicketTypeSerializer(serializers.ModelSerializer):
         fields = ['id', 'name']
 
 # Ticket Serializer (unchanged)
+# your_app/serializers.py
+
 class TicketSerializer(serializers.ModelSerializer):
-    ticket_type = serializers.PrimaryKeyRelatedField(queryset=TicketType.objects.all())
+    ticket_type = serializers.CharField(source='ticket_type.name', read_only=True)  # Added name
 
     class Meta:
         model = Ticket
-        fields = ['ticket_type', 'price', 'quantity']
+        fields = ['id', 'ticket_type', 'price', 'quantity', 'sold']
 
 # Event Serializer
 class EventSerializer(serializers.ModelSerializer):
@@ -137,10 +139,7 @@ class AttendeeSerializer(serializers.ModelSerializer):
 
 # Registration Serializer (unchanged)
 class RegistrationSerializer(serializers.ModelSerializer):
-    attendee = AttendeeSerializer(read_only=True)
-    event = EventSerializer(read_only=True)
-    ticket = TicketSerializer(read_only=True)
-
     class Meta:
         model = Registration
-        fields = ['id', 'attendee', 'registered_at', 'event', 'ticket']
+        fields = ['id', 'event', 'ticket', 'attendee']  # Added 'ticket'
+        read_only_fields = ['attendee']
